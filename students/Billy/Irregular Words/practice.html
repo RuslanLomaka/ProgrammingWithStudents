@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c1115">
+  <title>Verb Practice — Irregular Verbs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Verb Practice home"><span class="brand-mark">v.</span><span>VERB PRACTICE</span></a>
+      <span class="level-tag"><span class="pulse"></span> ENGLISH · IRREGULARS</span>
+    </header>
+
+    <section class="intro" id="top">
+      <p class="kicker">A LITTLE PRACTICE, EVERY DAY</p>
+      <h1>Make the strange<br><span>verbs stick.</span></h1>
+      <p class="intro-copy">See the forms, use them in a sentence, then spell them from memory.</p>
+    </section>
+
+    <section class="practice" aria-label="Irregular verb exercises">
+      <div class="practice-heading">
+        <div><p class="kicker">YOUR PRACTICE DECK</p><h2>Choose a way to practice</h2></div>
+        <div class="progress-chip"><span class="progress-dot"></span><span id="progressText">0 learned</span></div>
+      </div>
+      <nav class="tabs" role="tablist" aria-label="Practice mode">
+        <button class="tab active" id="tab-cards" role="tab" aria-selected="true" aria-controls="cardsPanel" data-panel="cardsPanel"><span>01</span> Flashcards</button>
+        <button class="tab" id="tab-gaps" role="tab" aria-selected="false" aria-controls="gapsPanel" data-panel="gapsPanel"><span>02</span> Sentence gaps</button>
+        <button class="tab" id="tab-spelling" role="tab" aria-selected="false" aria-controls="spellingPanel" data-panel="spellingPanel"><span>03</span> Missing letters</button>
+      </nav>
+
+      <section class="panel active" id="cardsPanel" role="tabpanel" aria-labelledby="tab-cards">
+        <div class="panel-meta"><span id="cardCounter">CARD 01 / 50</span><button class="text-button" id="shuffleCards" type="button">Shuffle deck ↗</button></div>
+        <article class="flashcard" id="flashcard">
+          <div class="card-top"><span class="card-label">INFINITIVE</span><span class="card-index" id="cardIndex">01</span></div>
+          <h3 class="base-word" id="cardBase">go</h3>
+          <p class="card-prompt" id="cardPrompt">Tap below to reveal the other forms.</p>
+          <div class="forms-row hidden" id="cardForms">
+            <div class="form"><span>PAST SIMPLE</span><strong id="cardPast">went</strong></div>
+            <div class="form"><span>PAST PARTICIPLE</span><strong id="cardPart">gone</strong></div>
+          </div>
+          <p class="meaning hidden" id="cardMeaning"></p>
+          <p class="example hidden" id="cardExample"></p>
+          <button class="reveal-button" id="revealCard" type="button">Show the forms <span>↓</span></button>
+        </article>
+        <div class="card-actions">
+          <button class="button secondary" id="againCard" type="button" disabled>Practice again</button>
+          <button class="button primary" id="knowCard" type="button" disabled>I know this one <span>→</span></button>
+        </div>
+        <p class="micro-note">“Read” keeps the same spelling; its past forms sound like <em>red</em>.</p>
+      </section>
+
+      <section class="panel" id="gapsPanel" role="tabpanel" aria-labelledby="tab-gaps" hidden>
+        <div class="exercise-card">
+          <div class="exercise-top"><span class="card-label">FILL THE GAP</span><span class="tense-pill" id="gapTense">PAST SIMPLE</span></div>
+          <p class="gap-sentence" id="gapSentence">Yesterday, we ___ to the lake.</p>
+          <p class="exercise-cue"><span class="cue-arrow" aria-hidden="true">↳</span> Use the <strong id="gapFormCue">past simple</strong> form of <strong id="gapBase">go</strong>.</p>
+          <form class="answer-form" id="gapForm" autocomplete="off">
+            <label class="sr-only" for="gapAnswer">Your answer</label>
+            <input id="gapAnswer" type="text" placeholder="Type the missing form" spellcheck="false" autocapitalize="none">
+            <button class="button primary" type="submit">Check <span>→</span></button>
+          </form>
+          <p class="feedback" id="gapFeedback" aria-live="polite"></p>
+          <button class="text-button next-exercise" id="nextGap" type="button">Another sentence ↗</button>
+        </div>
+      </section>
+
+      <section class="panel" id="spellingPanel" role="tabpanel" aria-labelledby="tab-spelling" hidden>
+        <div class="exercise-card spelling-card">
+          <div class="exercise-top"><span class="card-label">SPELL FROM MEMORY</span><span class="tense-pill" id="spellingTense">PAST PARTICIPLE</span></div>
+          <p class="spelling-cue">Write the complete form of</p>
+          <h3 class="spelling-base" id="spellingBase">write</h3>
+          <div class="letter-pattern" id="letterPattern" aria-label="Missing letters"></div>
+          <form class="answer-form" id="spellingForm" autocomplete="off">
+            <label class="sr-only" for="spellingAnswer">Write the complete form</label>
+            <input id="spellingAnswer" type="text" placeholder="Type the complete word" spellcheck="false" autocapitalize="none">
+            <button class="button primary" type="submit">Check <span>→</span></button>
+          </form>
+          <p class="feedback" id="spellingFeedback" aria-live="polite"></p>
+          <button class="text-button next-exercise" id="nextSpelling" type="button">Another word ↗</button>
+        </div>
+      </section>
+      <footer class="practice-footer"><span>50 COMMON VERBS · 78 GAP SENTENCES</span><span>TAKE YOUR TIME · TRY AGAIN</span></footer>
+    </section>
+    <footer class="page-footer"><span>ONE SMALL STEP FORWARD</span><span>BUILT FOR PRACTICE</span></footer>
+      <aside class="cookie-notice" id="cookieNotice" aria-labelledby="cookieTitle" role="region">
+      <div class="cookie-copy">
+        <p class="cookie-kicker">YOUR LEARNING JOURNEY</p>
+        <h2 id="cookieTitle">Save your progress?</h2>
+        <p>This website uses a small cookie to save your learning progress on this device. Your progress stays in this browser.</p>
+      </div>
+      <div class="cookie-actions">
+        <button class="cookie-button secondary" id="declineCookies" type="button">Not now</button>
+        <button class="cookie-button primary" id="acceptCookies" type="button">Allow progress saving</button>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>

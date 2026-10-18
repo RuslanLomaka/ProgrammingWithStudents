@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c1115">
+  <title>Time — A Minimal Clock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="clock-card" aria-label="Live clock">
+    <header class="topline">
+      <span class="eyebrow"><span class="live-dot"></span> LOCAL TIME</span>
+      <span class="timezone" id="timezone">LOCAL</span>
+    </header>
+    <nav class="mode-switch" aria-label="Clock style">
+      <button class="mode-button active" type="button" data-mode="digital" aria-pressed="true">DIGITAL</button>
+      <button class="mode-button" type="button" data-mode="analog" aria-pressed="false">ANALOG</button>
+      <button class="mode-button" type="button" data-mode="words" aria-pressed="false">IN WORDS</button>
+    </nav>
+    <section class="digital view-panel active" id="digitalView" aria-label="Digital time">
+      <div class="digit-row" id="digits" role="img" aria-label="--:--:--">
+        <div class="digit"></div><div class="digit"></div>
+        <span class="colon" aria-hidden="true"><i></i><i></i></span>
+        <div class="digit"></div><div class="digit"></div>
+        <span class="colon" aria-hidden="true"><i></i><i></i></span>
+        <div class="digit seconds-digit"></div><div class="digit seconds-digit"></div>
+      </div>
+      <div class="digital-labels"><span>HOURS</span><span>MINUTES</span><span>SECONDS</span></div>
+    </section>
+    <section class="analog-section view-panel" id="analogView" aria-label="Analog clock">
+      <div class="clock-face" id="face" role="img" aria-label="Analog clock">
+        <div class="face-ring"></div><div class="ticks" id="ticks" aria-hidden="true"></div>
+        <div class="hand hour-hand" id="hourHand"></div><div class="hand minute-hand" id="minuteHand"></div>
+        <div class="hand second-hand" id="secondHand"></div><div class="pin"></div>
+      </div>
+    </section>
+    <section class="word-section view-panel" id="wordsView" aria-label="Time written in words">
+      <div class="word-controls">
+        <div class="word-control-topline">
+          <div class="time-source" role="group" aria-label="Word clock time source">
+            <button class="source-button active" type="button" data-source="live" aria-pressed="true">ACTUAL TIME</button>
+            <button class="source-button" type="button" data-source="debug" aria-pressed="false">DEBUG TIME</button>
+          </div>
+          <output class="debug-readout" id="debugReadout" aria-live="off">--:--</output>
+        </div>
+        <label class="slider-label" for="timeSlider"><span>00:00</span><span>24 HOUR TIME SCRUBBER</span><span>24:00</span></label>
+        <input id="timeSlider" class="time-slider" type="range" min="0" max="1439" step="1" value="0" aria-label="Choose a time from midnight to 11:59 PM" disabled>
+        <p class="slider-help" id="sliderHelp">Showing your actual local time. Select Debug Time to move the slider.</p>
+      </div>
+      <div class="word-face" id="wordFace" role="img" aria-label="Time in words">
+        <div class="word-grid" id="wordGrid" aria-hidden="true"></div>
+      </div>
+      <p class="word-hint">EXACT TO THE MINUTE · QUARTERS &amp; HALF</p>
+    </section>
+    <footer class="date-line"><span id="date">Loading date…</span><span class="footer-mark">STAY IN THE MOMENT</span></footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101719">
+  <meta name="description" content="A collection of projects built by students during programming lessons.">
+  <title>Programming with Students</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="gallery.css">
+  <script src="gallery.js" defer></script>
+</head>
+<body>
+  <main class="site-shell">
+    <header class="masthead">
+      <a class="wordmark" href="./" aria-label="Programming with Students home"><span class="mark">P<span>·</span></span><span>PROGRAMMING<br>WITH STUDENTS</span></a>
+      <span class="edition"><span class="live-dot"></span> LESSON PROJECTS</span>
+    </header>
+
+    <section class="intro">
+      <p class="eyebrow">LEARN BY MAKING</p>
+      <h1>Small ideas.<br><span>Real projects.</span></h1>
+      <p class="intro-copy">A growing collection of things we build together, one lesson at a time.</p>
+    </section>
+
+    <section class="students" aria-labelledby="students-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">THE STUDENT LIST</p>
+          <h2 id="students-title">Choose a student</h2>
+        </div>
+        <span class="count">01 STUDENT</span>
+      </div>
+
+      <article class="student-card" id="billyCard">
+        <button class="student-toggle" id="billyToggle" type="button" aria-expanded="false" aria-controls="billyProjects">
+          <span class="student-avatar" aria-hidden="true">B</span>
+          <span class="student-info"><strong>Billy</strong><span>Two projects from today’s lesson</span></span>
+          <span class="project-count">02 PROJECTS</span>
+          <span class="toggle-icon" aria-hidden="true">+</span>
+        </button>
+
+        <div class="projects" id="billyProjects" hidden>
+          <div class="project-grid">
+            <article class="project-card">
+              <div class="project-heading">
+                <div><p class="eyebrow">PROJECT 01</p><h3>A Minimal Clock</h3></div>
+                <span class="project-symbol" aria-hidden="true">◷</span>
+              </div>
+              <p class="project-description">Digital, analog, and word clock styles, with a time scrubber for exploring the word clock.</p>
+              <div class="preview-frame clock-preview">
+                <iframe src="students/Billy/Clock/clock.html" title="Billy’s clock project preview" loading="lazy"></iframe>
+              </div>
+              <a class="open-link" href="students/Billy/Clock/clock.html" target="_blank" rel="noopener">Open clock <span aria-hidden="true">↗</span></a>
+            </article>
+
+            <article class="project-card">
+              <div class="project-heading">
+                <div><p class="eyebrow">PROJECT 02</p><h3>Irregular Words</h3></div>
+                <span class="project-symbol text-symbol" aria-hidden="true">Aa</span>
+              </div>
+              <p class="project-description">Flashcards, sentence gaps, and missing-letter spelling practice for English verbs.</p>
+              <div class="preview-frame words-preview">
+                <iframe src="students/Billy/Irregular%20Words/practice.html" title="Billy’s irregular verbs practice preview" loading="lazy"></iframe>
+              </div>
+              <a class="open-link" href="students/Billy/Irregular%20Words/practice.html" target="_blank" rel="noopener">Open practice <span aria-hidden="true">↗</span></a>
+            </article>
+          </div>
+          <p class="future-note"><span aria-hidden="true">✳</span> More student projects will find a home here.</p>
+        </div>
+      </article>
+    </section>
+
+    <footer class="site-footer"><span>MADE TOGETHER · BUILT ONE STEP AT A TIME</span><span>PROGRAMMING WITH STUDENTS</span></footer>
+  </main>
+</body>
+</html>
