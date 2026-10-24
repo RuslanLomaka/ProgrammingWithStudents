@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rugby Vocab Champions</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #064e3b;
+            color: #0f172a;
+        }
+
+        .font-display {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+
+        /* 3D card flip effects */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+
+        .card-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* Custom tactile 3D buttons */
+        .btn-3d-yellow {
+            background-color: #facc15;
+            box-shadow: 0 5px 0 #ca8a04, 0 10px 15px -3px rgba(0,0,0,0.3);
+            transition: all 0.1s ease;
+        }
+
+        .btn-3d-yellow:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #ca8a04, 0 5px 10px -3px rgba(0,0,0,0.3);
+        }
+
+        .btn-3d-emerald {
+            background-color: #059669;
+            box-shadow: 0 5px 0 #047857, 0 10px 15px -3px rgba(0,0,0,0.3);
+            transition: all 0.1s ease;
+        }
+
+        .btn-3d-emerald:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #047857, 0 5px 10px -3px rgba(0,0,0,0.3);
+        }
+
+        /* Goal post bounce effect */
+        @keyframes floatPost {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .float-anim {
+            animation: floatPost 3s ease-in-out infinite;
+        }
+
+        /* Wrong answer shake animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-900 pb-12 flex flex-col items-center">
+
+    <!-- TOP NAVIGATION HEADER -->
+    <header class="w-full bg-slate-900 border-b-4 border-amber-400 py-3 px-4 shadow-xl sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <!-- App Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-amber-400 border-2 border-amber-500 flex items-center justify-center text-slate-950 font-black text-xl shadow-inner">
+                    <i class="fa-solid fa-football"></i>
+                </div>
+                <div>
+                    <h1 class="font-display text-xl sm:text-2xl font-bold text-amber-400 tracking-wide leading-none">
+                        RUGBY VOCAB <span class="text-white">CHAMPS</span>
+                    </h1>
+                    <p class="text-emerald-300 text-xs font-semibold">Fun Rugby English for Young Champions!</p>
+                </div>
+            </div>
+
+            <!-- Score & Mud Meter Counter -->
+            <div class="flex items-center gap-3 bg-slate-800 px-3.5 py-1.5 rounded-full border border-slate-700">
+                <div class="flex items-center gap-1.5 text-amber-400 font-bold text-sm">
+                    <i class="fa-solid fa-trophy text-amber-400"></i>
+                    <span>Score:</span>
+                    <span id="player-score" class="text-white text-lg font-black font-display">0</span>
+                </div>
+                <div class="h-4 w-px bg-slate-600 my-auto"></div>
+                <div class="flex items-center gap-1.5 text-emerald-400 font-bold text-xs">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span id="mud-rank">Rookie Player</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="w-full max-w-4xl px-3 sm:px-6 pt-4 flex-grow flex flex-col gap-6">
+
+        <!-- TAB NAVIGATION -->
+        <nav class="flex rounded-2xl bg-slate-900/90 p-1.5 border-2 border-amber-400/40 shadow-lg gap-1 sm:gap-2">
+            <button id="tab-btn-playbook" onclick="switchTab('playbook')" class="flex-1 py-2.5 px-2 rounded-xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all bg-amber-400 text-slate-950 shadow-md">
+                <i class="fa-solid fa-book-open"></i>
+                <span>1. Playbook</span>
+            </button>
+            <button id="tab-btn-kick" onclick="switchTab('kick')" class="flex-1 py-2.5 px-2 rounded-xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all text-slate-200 hover:text-white hover:bg-slate-800">
+                <i class="fa-solid fa-bullseye"></i>
+                <span>2. Kick Goal</span>
+            </button>
+            <button id="tab-btn-try" onclick="switchTab('try')" class="flex-1 py-2.5 px-2 rounded-xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all text-slate-200 hover:text-white hover:bg-slate-800">
+                <i class="fa-solid fa-person-running"></i>
+                <span>3. Try Scorer</span>
+            </button>
+        </nav>
+
+        <!-- ================= TAB 1: PLAYBOOK (FLASHCARDS) ================= -->
+        <section id="section-playbook" class="tab-section block">
+            <div class="bg-slate-900/95 rounded-3xl p-4 sm:p-6 border-4 border-emerald-500/30 shadow-2xl flex flex-col items-center">
+
+                <!-- Playbook Header Info -->
+                <div class="w-full flex items-center justify-between mb-4 px-2">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-amber-400 text-slate-950 text-xs font-black px-2.5 py-1 rounded-full uppercase tracking-wider">
+                            Rugby Flashcard
+                        </span>
+                        <span class="text-slate-300 text-xs font-bold hidden sm:inline">
+                            Tap card to flip definition 🔄
+                        </span>
+                    </div>
+                    <div class="text-amber-400 font-display font-bold text-sm sm:text-base">
+                        Word <span id="card-counter">1</span> of <span id="card-total">10</span>
+                    </div>
+                </div>
+
+                <!-- 3D FLIP CARD CONTAINER -->
+                <div class="w-full max-w-lg h-[410px] sm:h-[430px] perspective-1000">
+                    <div id="flashcard-inner" onclick="toggleCardFlip()" class="w-full h-full transform-style-3d cursor-pointer relative rounded-3xl shadow-2xl">
+
+                        <!-- CARD FRONT -->
+                        <div class="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-amber-400 via-amber-300 to-amber-500 rounded-3xl border-4 border-amber-200 p-6 flex flex-col justify-between items-center text-center shadow-xl">
+                            <!-- Top Front Row -->
+                            <div class="w-full flex justify-between items-center">
+                                <span id="card-front-tag" class="bg-slate-900 text-amber-300 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider border border-slate-700">
+                                    Action Word
+                                </span>
+                                <button onclick="event.stopPropagation(); speakWord();" title="Listen to pronunciation" class="bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold px-3 py-1.5 rounded-full text-xs flex items-center gap-1.5 border border-amber-400/40 shadow-sm active:scale-95 transition-transform">
+                                    <i class="fa-solid fa-volume-high text-sm"></i>
+                                    <span>Listen 🔊</span>
+                                </button>
+                            </div>
+
+                            <!-- Card Front Center -->
+                            <div class="my-auto">
+                                <div id="card-front-icon" class="text-6xl sm:text-7xl mb-3 text-slate-950 drop-shadow-md">
+                                    🏉
+                                </div>
+                                <h2 id="card-front-word" class="font-display text-4xl sm:text-5xl font-extrabold text-slate-950 tracking-wide uppercase">
+                                    TACKLE
+                                </h2>
+                                <p id="card-front-phonetic" class="text-slate-900/80 font-bold text-sm sm:text-base mt-2 bg-amber-200/60 px-3 py-1 rounded-full border border-amber-400/50 inline-block">
+                                    / ˈtæk.əl /
+                                </p>
+                            </div>
+
+                            <!-- Front Bottom Prompt -->
+                            <div class="w-full bg-slate-900/10 rounded-2xl py-2 px-3 border border-slate-900/10 flex items-center justify-center gap-2 text-slate-900 font-bold text-xs sm:text-sm">
+                                <i class="fa-solid fa-rotate text-amber-900 animate-spin"></i>
+                                <span>Click anywhere to reveal the meaning! 🔄</span>
+                            </div>
+                        </div>
+
+                        <!-- CARD BACK (CRISP WHITE BACKGROUND & DARK TEXT) -->
+                        <div class="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-white rounded-3xl border-4 border-slate-900 p-5 sm:p-6 flex flex-col justify-between items-stretch shadow-2xl text-left">
+
+                            <!-- Header Back Row -->
+                            <div class="flex items-center justify-between pb-2 border-b-2 border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <h3 id="card-back-word" class="font-display text-2xl sm:text-3xl font-black text-slate-900">
+                                        TACKLE
+                                    </h3>
+                                    <span id="card-back-phonetic" class="text-emerald-700 text-xs sm:text-sm font-black px-2.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-200">
+                                        / ˈtæk.əl /
+                                    </span>
+                                </div>
+                                <button onclick="event.stopPropagation(); speakWord();" title="Listen again" class="bg-slate-100 hover:bg-slate-200 text-slate-800 p-2 rounded-xl border border-slate-300 text-xs font-bold transition-all active:scale-95">
+                                    <i class="fa-solid fa-volume-high text-amber-600"></i>
+                                </button>
+                            </div>
+
+                            <!-- Simplified English Definition -->
+                            <div class="my-auto space-y-3 py-1">
+                                <div>
+                                    <p class="text-slate-400 uppercase tracking-wider text-[10px] font-black">Simple Definition</p>
+                                    <p id="card-back-def" class="text-slate-900 font-extrabold text-base sm:text-lg leading-snug">
+                                        To grab or hit a player safely with your arms to stop them running.
+                                    </p>
+                                </div>
+
+                                <!-- Example Sentence Callout -->
+                                <div class="bg-blue-50 border-l-4 border-blue-600 p-3 rounded-r-2xl">
+                                    <p class="text-blue-900/70 text-[10px] uppercase font-black">Rugby Match Example</p>
+                                    <p class="text-blue-950 font-extrabold text-xs sm:text-sm italic leading-snug mt-0.5" id="card-back-example">
+                                        "Tom made a big tackle to save the match!"
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Funny Memory Hook / Tip Box -->
+                            <div class="bg-amber-100 border-2 border-amber-300 p-2.5 rounded-2xl flex items-start gap-2.5 text-slate-900">
+                                <div class="text-xl text-amber-700 shrink-0 mt-0.5">💡</div>
+                                <div class="text-xs sm:text-sm font-extrabold text-amber-950 leading-tight">
+                                    <span class="text-amber-800 font-black">Funny Tip:</span>
+                                    <span id="card-back-funny">Tackle the ball player, not the referee!</span>
+                                </div>
+                            </div>
+
+                            <!-- Back Flip Prompt -->
+                            <div class="text-center pt-2 text-xs font-bold text-slate-400 flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-rotate text-slate-400"></i>
+                                <span>Click card to flip back</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PLAYBOOK NAVIGATION CONTROLS -->
+                <div class="flex items-center justify-between w-full max-w-lg mt-6 gap-3">
+                    <button onclick="prevCard()" class="btn-3d-emerald text-white font-display font-bold px-5 py-2.5 rounded-2xl text-base flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-left"></i> Previous
+                    </button>
+
+                    <button onclick="speakWord()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold p-3 rounded-2xl text-lg border border-slate-700 shadow-md active:scale-95 transition-transform" title="Audio Pronunciation">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+
+                    <button onclick="nextCard()" class="btn-3d-yellow text-slate-950 font-display font-bold px-5 py-2.5 rounded-2xl text-base flex items-center gap-2">
+                        Next <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= TAB 2: KICK FOR GOAL MINI-GAME ================= -->
+        <section id="section-kick" class="tab-section hidden">
+            <div class="bg-slate-900/95 rounded-3xl p-4 sm:p-6 border-4 border-emerald-500/30 shadow-2xl flex flex-col items-center">
+
+                <div class="text-center mb-4">
+                    <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-amber-400">
+                        KICK FOR GOAL! ⚽
+                    </h2>
+                    <p class="text-slate-300 text-xs sm:text-sm font-semibold">
+                        Choose the correct definition to kick the ball through the posts!
+                    </p>
+                </div>
+
+                <!-- GAME FIELD CONTAINER -->
+                <div class="w-full max-w-xl bg-gradient-to-b from-sky-400 via-sky-200 to-emerald-600 rounded-2xl border-4 border-slate-900 p-4 relative overflow-hidden flex flex-col items-center justify-between h-[340px] shadow-inner">
+
+                    <!-- Goalposts Visual -->
+                    <div class="w-full flex justify-center pt-2 z-10 float-anim">
+                        <div class="relative w-40 h-28 border-l-8 border-r-8 border-yellow-300 flex items-center justify-center">
+                            <!-- Crossbar -->
+                            <div class="absolute bottom-6 w-full h-2.5 bg-yellow-300 shadow-md"></div>
+                            <div id="kick-feedback" class="hidden text-center bg-slate-900/90 text-amber-300 font-display font-extrabold text-lg px-4 py-1.5 rounded-xl border-2 border-amber-400 shadow-xl z-30">
+                                PERFECT KICK! ⚽🔥
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Target Word Prompt Banner -->
+                    <div class="z-20 bg-slate-900 text-white rounded-2xl px-4 py-3 border-2 border-amber-400 text-center w-full max-w-md shadow-xl my-auto">
+                        <div class="text-amber-400 text-xs font-bold uppercase tracking-widest">Target Rugby Word</div>
+                        <div id="kick-target-word" class="font-display text-2xl sm:text-3xl font-black text-white mt-0.5">
+                            TACKLE
+                        </div>
+                        <div id="kick-target-phonetic" class="text-emerald-400 text-xs font-bold">
+                            / ˈtæk.əl /
+                        </div>
+                    </div>
+
+                    <!-- Animated Rugby Ball -->
+                    <div id="kick-ball" class="z-20 text-4xl sm:text-5xl transition-all duration-700 transform drop-shadow-xl my-2">
+                        🏉
+                    </div>
+                </div>
+
+                <!-- Multiple Choice Option Buttons -->
+                <div class="w-full max-w-xl grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4" id="kick-options-container">
+                    <!-- Dynamic option buttons injected via JS -->
+                </div>
+
+                <!-- NEXT QUESTION BUTTON BAR (KICK GAME) -->
+                <div class="w-full max-w-xl mt-4 flex items-center justify-between bg-slate-800 p-3 rounded-2xl border border-slate-700">
+                    <span id="kick-status-text" class="text-amber-300 text-xs sm:text-sm font-extrabold">
+                        Select your answer!
+                    </span>
+                    <button id="kick-next-btn" onclick="initKickGame()" class="btn-3d-yellow text-slate-950 font-display font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-2">
+                        <span>Next Question</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= TAB 3: TRY SCORER MINI-GAME ================= -->
+        <section id="section-try" class="tab-section hidden">
+            <div class="bg-slate-900/95 rounded-3xl p-4 sm:p-6 border-4 border-emerald-500/30 shadow-2xl flex flex-col items-center">
+
+                <div class="text-center mb-4">
+                    <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-amber-400">
+                        TRY SCORER! 🏃‍♂️💨
+                    </h2>
+                    <p class="text-slate-300 text-xs sm:text-sm font-semibold">
+                        Match the word to its rugby description to charge down the field!
+                    </p>
+                </div>
+
+                <!-- Field Progress Tracker -->
+                <div class="w-full max-w-xl bg-slate-950 p-3 rounded-2xl border-2 border-slate-800 mb-4">
+                    <div class="flex justify-between text-xs font-bold text-slate-400 mb-1">
+                        <span>START LINE</span>
+                        <span id="try-streak-text" class="text-amber-400 font-display">Tries Scored: 0</span>
+                        <span>TRY LINE 🏆</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-4 rounded-full overflow-hidden border border-slate-700 p-0.5">
+                        <div id="try-progress-bar" class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full w-1/5 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Target English Description Banner -->
+                <div class="bg-slate-800 border-2 border-emerald-500 rounded-2xl p-4 text-center w-full max-w-xl shadow-xl mb-4">
+                    <span class="bg-emerald-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wide">
+                        Which word matches this definition?
+                    </span>
+                    <h3 id="try-target-def" class="font-display text-lg sm:text-xl font-bold text-amber-300 mt-2 leading-snug">
+                        "Players pack together tightly to restart the game."
+                    </h3>
+                </div>
+
+                <!-- Choice Buttons Grid -->
+                <div class="w-full max-w-xl grid grid-cols-1 sm:grid-cols-2 gap-3" id="try-options-container">
+                    <!-- Dynamic option buttons injected via JS -->
+                </div>
+
+                <!-- NEXT QUESTION BUTTON BAR (TRY GAME) -->
+                <div class="w-full max-w-xl mt-4 flex items-center justify-between bg-slate-800 p-3 rounded-2xl border border-slate-700">
+                    <span id="try-status-text" class="text-amber-300 text-xs sm:text-sm font-extrabold">
+                        Choose the matching rugby word!
+                    </span>
+                    <button id="try-next-btn" onclick="initTryGame()" class="btn-3d-yellow text-slate-950 font-display font-extrabold px-4 py-2 rounded-xl text-sm flex items-center gap-2">
+                        <span>Next Question</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= MASCOT & COMMENTARY BOARD ================= -->
+        <section class="bg-slate-900/90 rounded-3xl p-4 border-2 border-amber-400/40 shadow-xl flex items-center gap-4">
+            <div onclick="mascotSqueak()" class="w-16 h-16 sm:w-20 sm:h-20 bg-amber-400 rounded-2xl border-2 border-amber-500 flex items-center justify-center text-3xl sm:text-4xl shrink-0 shadow-lg cursor-pointer hover:scale-105 active:scale-95 transition-transform" title="Click Buster for a silly comment!">
+                🐶
+            </div>
+            <div class="flex-grow">
+                <div class="flex items-center gap-2 mb-1">
+                    <h4 class="font-display font-bold text-amber-400 text-base sm:text-lg">Buster the Muddy Mascot</h4>
+                    <span class="bg-emerald-800 text-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-md">Head Coach</span>
+                </div>
+                <p id="mascot-speech" class="text-slate-100 font-bold text-xs sm:text-sm leading-relaxed">
+                    "WHISTLE BLOWN! Welcome to Rugby Vocab Champs! Tap any card to start learning!"
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-8 text-center text-slate-400 text-xs font-semibold">
+        Rugby Vocab Champions &bull; Interactive English Learning for Young Rugby Fans
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* ================= VOCABULARY DATASET (ENGLISH ONLY / ESL A2) ================= */
+        const vocabList = [
+            {
+                word: "TACKLE",
+                phonetic: "/ ˈtæk.əl /",
+                type: "Action Word",
+                easyDef: "To grab or hit a player safely with your arms to stop them running.",
+                example: "Tom made a big tackle to save the match!",
+                funny: "Tackle the ball player, not the referee!",
+                icon: "🏃‍♂️"
+            },
+            {
+                word: "SCRUM",
+                phonetic: "/ skrʌm /",
+                type: "Formation",
+                easyDef: "Players pack together tightly in a group to restart the game.",
+                example: "The forwards formed a strong scrum to win the ball.",
+                funny: "A scrum looks like a big group hug in the mud!",
+                icon: "🏉"
+            },
+            {
+                word: "TRY",
+                phonetic: "/ traɪ /",
+                type: "Score",
+                easyDef: "Pressing the ball on the ground in the end zone to score 5 points.",
+                example: "She ran past three defenders and scored a try!",
+                funny: "A Try is worth 5 points—don't forget to smile when you score!",
+                icon: "🏆"
+            },
+            {
+                word: "PASS",
+                phonetic: "/ pɑːs /",
+                type: "Action Word",
+                easyDef: "Throwing the rugby ball sideways or backwards to your teammate.",
+                example: "Pass the ball to your teammate quickly!",
+                funny: "Never pass forwards, or the referee will blow the whistle!",
+                icon: "👐"
+            },
+            {
+                word: "PUNT",
+                phonetic: "/ pʌnt /",
+                type: "Kick",
+                easyDef: "Dropping the ball from your hands and kicking it before it touches the ground.",
+                example: "The full-back kicked a long punt down the field.",
+                funny: "Kick it high into the clouds!",
+                icon: "🦵"
+            },
+            {
+                word: "REFEREE",
+                phonetic: "/ ˌref.əˈriː /",
+                type: "Person",
+                easyDef: "The official person who controls the rugby match and blows the whistle.",
+                example: "Always listen to the referee's decisions.",
+                funny: "The ref has a whistle and is always right!",
+                icon: "👮"
+            },
+            {
+                word: "PITCH",
+                phonetic: "/ pɪtʃ /",
+                type: "Field",
+                easyDef: "The grass field where rugby matches are played.",
+                example: "The players ran out onto the green pitch.",
+                funny: "When it rains, the pitch becomes a giant mud puddle!",
+                icon: "🌱"
+            },
+            {
+                word: "KNOCK-ON",
+                phonetic: "/ nɒk.ɒn /",
+                type: "Foul",
+                easyDef: "Accidentally dropping or losing the ball forwards towards the opponent's goal.",
+                example: "Oh no! A knock-on gives a scrum to the other team.",
+                funny: "Butter fingers! Put sticky glue on your gloves!",
+                icon: "🧈"
+            },
+            {
+                word: "LINE-OUT",
+                phonetic: "/ laɪn.aʊt /",
+                type: "Formation",
+                easyDef: "Restarting play by throwing the ball between two lines of players after it went out.",
+                example: "Players jumped high in the line-out to catch the ball.",
+                funny: "Jump high like a kangaroo to win the ball!",
+                icon: "🦘"
+            },
+            {
+                word: "HOOKER",
+                phonetic: "/ ˈhʊk.ər /",
+                type: "Position",
+                easyDef: "The player in the middle of the scrum who uses their feet to hook the ball back.",
+                example: "The hooker won the ball for our team in the scrum!",
+                funny: "Quick feet win the ball in the mud!",
+                icon: "👟"
+            }
+        ];
+
+        /* ================= GLOBAL STATE ================= */
+        let currentCardIdx = 0;
+        let isCardFlipped = false;
+        let score = 0;
+        let tryStreak = 0;
+
+        let kickAutoTimeout = null;
+        let tryAutoTimeout = null;
+
+        /* Sound Effect Synthesizer (Web Audio API) */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSynthSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'kick') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(160, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(420, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'cheer') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(520, audioCtx.currentTime + 0.1);
+                    osc.frequency.setValueAtTime(720, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(130, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'pop') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                }
+            } catch (e) {
+                console.log("Audio synth playback error", e);
+            }
+        }
+
+        /* Web Speech API for English Audio Pronunciation */
+        function speakWord() {
+            const card = vocabList[currentCardIdx];
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(card.word);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; // Slightly slower speed for ESL clarity
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        /* ================= TAB SWITCHING LOGIC ================= */
+        function switchTab(tabName) {
+            playSynthSound('pop');
+
+            // Clear pending game auto-timeouts
+            if (kickAutoTimeout) clearTimeout(kickAutoTimeout);
+            if (tryAutoTimeout) clearTimeout(tryAutoTimeout);
+
+            // Hide all tab sections
+            document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
+
+            // Reset nav button styling
+            const navBtns = ['playbook', 'kick', 'try'];
+            navBtns.forEach(b => {
+                const btn = document.getElementById(`tab-btn-${b}`);
+                btn.className = "flex-1 py-2.5 px-2 rounded-xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all text-slate-200 hover:text-white hover:bg-slate-800";
+            });
+
+            // Activate chosen tab
+            document.getElementById(`section-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            activeBtn.className = "flex-1 py-2.5 px-2 rounded-xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all bg-amber-400 text-slate-950 shadow-md";
+
+            if (tabName === 'kick') {
+                initKickGame();
+            } else if (tabName === 'try') {
+                initTryGame();
+            }
+        }
+
+        /* ================= PLAYBOOK (FLASHCARD) LOGIC ================= */
+        function updateCardDisplay() {
+            const card = vocabList[currentCardIdx];
+
+            // Reset Flip state
+            isCardFlipped = false;
+            document.getElementById('flashcard-inner').classList.remove('card-flipped');
+
+            // Counters
+            document.getElementById('card-counter').innerText = currentCardIdx + 1;
+            document.getElementById('card-total').innerText = vocabList.length;
+
+            // Front Elements
+            document.getElementById('card-front-tag').innerText = card.type;
+            document.getElementById('card-front-icon').innerText = card.icon;
+            document.getElementById('card-front-word').innerText = card.word;
+            document.getElementById('card-front-phonetic').innerText = card.phonetic;
+
+            // Back Elements (Ultra high contrast white surface)
+            document.getElementById('card-back-word').innerText = card.word;
+            document.getElementById('card-back-phonetic').innerText = card.phonetic;
+            document.getElementById('card-back-def').innerText = card.easyDef;
+            document.getElementById('card-back-example').innerText = `"${card.example}"`;
+            document.getElementById('card-back-funny').innerText = card.funny;
+        }
+
+        function toggleCardFlip() {
+            playSynthSound('pop');
+            isCardFlipped = !isCardFlipped;
+            const inner = document.getElementById('flashcard-inner');
+            if (isCardFlipped) {
+                inner.classList.add('card-flipped');
+            } else {
+                inner.classList.remove('card-flipped');
+            }
+        }
+
+        function nextCard() {
+            playSynthSound('pop');
+            currentCardIdx = (currentCardIdx + 1) % vocabList.length;
+            updateCardDisplay();
+        }
+
+        function prevCard() {
+            playSynthSound('pop');
+            currentCardIdx = (currentCardIdx - 1 + vocabList.length) % vocabList.length;
+            updateCardDisplay();
+        }
+
+        /* ================= GAME 1: KICK FOR GOAL ================= */
+        let currentKickTarget = null;
+        let kickAnswered = false;
+
+        function initKickGame() {
+            if (kickAutoTimeout) clearTimeout(kickAutoTimeout);
+            kickAnswered = false;
+
+            const randomIndex = Math.floor(Math.random() * vocabList.length);
+            currentKickTarget = vocabList[randomIndex];
+
+            document.getElementById('kick-target-word').innerText = currentKickTarget.word;
+            document.getElementById('kick-target-phonetic').innerText = currentKickTarget.phonetic;
+
+            // Reset feedback & ball position
+            const feedback = document.getElementById('kick-feedback');
+            feedback.classList.add('hidden');
+
+            const ball = document.getElementById('kick-ball');
+            ball.style.transform = 'translateY(0) scale(1)';
+            ball.style.opacity = '1';
+
+            document.getElementById('kick-status-text').innerText = "Select your answer!";
+            document.getElementById('kick-status-text').className = "text-amber-300 text-xs sm:text-sm font-extrabold";
+
+            // Options generation (1 correct + 3 distractors)
+            let options = [currentKickTarget];
+            while (options.length < 4) {
+                const rand = vocabList[Math.floor(Math.random() * vocabList.length)];
+                if (!options.some(o => o.word === rand.word)) {
+                    options.push(rand);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById('kick-options-container');
+            container.innerHTML = '';
+
+            const optionPrefixes = ['A)', 'B)', 'C)', 'D)'];
+
+            options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 text-white font-bold p-3 rounded-2xl text-xs sm:text-sm text-left transition-all active:scale-95 shadow-md flex items-center gap-2.5";
+                btn.dataset.word = opt.word;
+                btn.innerHTML = `
+                    <div class="w-7 h-7 rounded-full bg-amber-400 border border-amber-500 text-slate-950 font-display font-extrabold flex items-center justify-center shrink-0 text-xs shadow-inner">${optionPrefixes[index]}</div>
+                    <div class="text-slate-100 font-extrabold leading-tight">${opt.easyDef}</div>
+                `;
+                btn.onclick = () => handleKickAnswer(opt.word === currentKickTarget.word, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function handleKickAnswer(isCorrect, btnEl) {
+            if (kickAnswered) return;
+            kickAnswered = true;
+
+            const buttons = document.querySelectorAll('#kick-options-container button');
+            buttons.forEach(b => b.classList.add('pointer-events-none'));
+
+            if (isCorrect) {
+                playSynthSound('kick');
+                setTimeout(() => playSynthSound('cheer'), 200);
+
+                // Ball kick animation
+                const ball = document.getElementById('kick-ball');
+                ball.style.transform = 'translateY(-130px) scale(0.5)';
+                ball.style.opacity = '0.8';
+
+                // Feedback banner
+                const feedback = document.getElementById('kick-feedback');
+                feedback.innerText = "PERFECT KICK! +10 Pts";
+                feedback.classList.remove('hidden');
+
+                btnEl.className = "bg-emerald-600 border-2 border-emerald-400 text-white font-bold p-3 rounded-2xl text-xs sm:text-sm text-left shadow-lg flex items-center gap-2.5";
+
+                document.getElementById('kick-status-text').innerText = "Correct! Loading next question...";
+                document.getElementById('kick-status-text').className = "text-emerald-400 text-xs sm:text-sm font-extrabold";
+
+                addScore(10);
+                updateMascotSpeech("GOAL! Spectacular kick right through the posts! +10 Points!");
+
+                kickAutoTimeout = setTimeout(() => {
+                    initKickGame();
+                }, 1800);
+            } else {
+                playSynthSound('wrong');
+
+                // Shake button
+                btnEl.classList.add('animate-shake');
+                btnEl.className = "bg-red-900/90 border-2 border-red-500 text-white font-bold p-3 rounded-2xl text-xs sm:text-sm text-left opacity-80 flex items-center gap-2.5 animate-shake";
+
+                // Highlight correct option
+                buttons.forEach(b => {
+                    if (b.dataset.word === currentKickTarget.word) {
+                        b.className = "bg-emerald-600/90 border-2 border-emerald-400 text-white font-bold p-3 rounded-2xl text-xs sm:text-sm text-left shadow-md flex items-center gap-2.5";
+                    }
+                });
+
+                document.getElementById('kick-status-text').innerText = "Missed kick! Click Next Question to continue.";
+                document.getElementById('kick-status-text').className = "text-amber-400 text-xs sm:text-sm font-extrabold";
+
+                updateMascotSpeech("Unfortunate kick! Check the correct definition and hit Next Question!");
+
+                kickAutoTimeout = setTimeout(() => {
+                    initKickGame();
+                }, 2500);
+            }
+        }
+
+        /* ================= GAME 2: TRY SCORER ================= */
+        let currentTryTarget = null;
+        let tryAnswered = false;
+
+        function initTryGame() {
+            if (tryAutoTimeout) clearTimeout(tryAutoTimeout);
+            tryAnswered = false;
+
+            const randomIndex = Math.floor(Math.random() * vocabList.length);
+            currentTryTarget = vocabList[randomIndex];
+
+            document.getElementById('try-target-def').innerText = `"${currentTryTarget.easyDef}"`;
+
+            document.getElementById('try-status-text').innerText = "Choose the matching rugby word!";
+            document.getElementById('try-status-text').className = "text-amber-300 text-xs sm:text-sm font-extrabold";
+
+            // Generate options (1 correct + 3 distractor words)
+            let options = [currentTryTarget];
+            while (options.length < 4) {
+                const rand = vocabList[Math.floor(Math.random() * vocabList.length)];
+                if (!options.some(o => o.word === rand.word)) {
+                    options.push(rand);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById('try-options-container');
+            container.innerHTML = '';
+
+            const optionPrefixes = ['A)', 'B)', 'C)', 'D)'];
+
+            options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 text-white font-extrabold p-3 sm:p-4 rounded-2xl text-sm sm:text-base text-left transition-all active:scale-95 shadow-md flex items-center gap-3";
+                btn.dataset.word = opt.word;
+                btn.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-amber-400 border border-amber-500 text-slate-950 font-display font-black flex items-center justify-center shrink-0 text-sm shadow-inner">${optionPrefixes[index]}</div>
+                    <div class="flex flex-col">
+                        <span class="text-amber-400 font-display text-lg sm:text-xl font-black uppercase leading-tight">${opt.word}</span>
+                        <span class="text-slate-400 text-xs font-semibold">${opt.phonetic}</span>
+                    </div>
+                `;
+                btn.onclick = () => handleTryAnswer(opt.word === currentTryTarget.word, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function handleTryAnswer(isCorrect, btnEl) {
+            if (tryAnswered) return;
+            tryAnswered = true;
+
+            const buttons = document.querySelectorAll('#try-options-container button');
+            buttons.forEach(b => b.classList.add('pointer-events-none'));
+
+            if (isCorrect) {
+                playSynthSound('cheer');
+                btnEl.className = "bg-emerald-600 border-2 border-emerald-400 text-white font-extrabold p-3 sm:p-4 rounded-2xl text-sm sm:text-base text-left shadow-lg flex items-center gap-3";
+
+                tryStreak++;
+                addScore(15);
+
+                const progressBar = document.getElementById('try-progress-bar');
+                const progressPct = Math.min(100, (tryStreak % 5) * 20 + 20);
+                progressBar.style.width = `${progressPct}%`;
+                document.getElementById('try-streak-text').innerText = `Tries Scored: ${Math.floor(tryStreak / 5)}`;
+
+                document.getElementById('try-status-text').innerText = "Correct answer! Loading next question...";
+                document.getElementById('try-status-text').className = "text-emerald-400 text-xs sm:text-sm font-extrabold";
+
+                if (tryStreak % 5 === 0) {
+                    updateMascotSpeech("TOUCHDOWN TRY! 5 successful runs! You are a Rugby Superstar!");
+                } else {
+                    updateMascotSpeech("Great match! You dodged the defender for +15 Points!");
+                }
+
+                tryAutoTimeout = setTimeout(() => {
+                    initTryGame();
+                }, 1600);
+            } else {
+                playSynthSound('wrong');
+
+                btnEl.classList.add('animate-shake');
+                btnEl.className = "bg-red-900/90 border-2 border-red-500 text-white font-extrabold p-3 sm:p-4 rounded-2xl text-sm sm:text-base text-left opacity-80 flex items-center gap-3 animate-shake";
+
+                // Highlight correct option
+                buttons.forEach(b => {
+                    if (b.dataset.word === currentTryTarget.word) {
+                        b.className = "bg-emerald-600/90 border-2 border-emerald-400 text-white font-extrabold p-3 sm:p-4 rounded-2xl text-sm sm:text-base text-left shadow-md flex items-center gap-3";
+                    }
+                });
+
+                document.getElementById('try-status-text').innerText = "Tackled! Click Next Question to continue.";
+                document.getElementById('try-status-text').className = "text-amber-400 text-xs sm:text-sm font-extrabold";
+
+                updateMascotSpeech("Tackled by defenders! Review the word and click Next Question!");
+
+                tryAutoTimeout = setTimeout(() => {
+                    initTryGame();
+                }, 2200);
+            }
+        }
+
+        /* ================= MASCOT & PROGRESSION SYSTEM ================= */
+        function addScore(pts) {
+            score += pts;
+            document.getElementById('player-score').innerText = score;
+
+            // Trophy progression system
+            const rankEl = document.getElementById('mud-rank');
+            if (score >= 100) {
+                rankEl.innerText = "Rugby Legend 🏆";
+                rankEl.className = "text-amber-400 font-extrabold text-xs";
+            } else if (score >= 50) {
+                rankEl.innerText = "Mud Champion 🥇";
+                rankEl.className = "text-yellow-300 font-extrabold text-xs";
+            } else if (score >= 20) {
+                rankEl.innerText = "Pro Player 🥈";
+                rankEl.className = "text-emerald-300 font-extrabold text-xs";
+            }
+        }
+
+        function updateMascotSpeech(text) {
+            document.getElementById('mascot-speech').innerText = `"${text}"`;
+        }
+
+        function mascotSqueak() {
+            playSynthSound('pop');
+            const funnyQuotes = [
+                "WHISTLE BLOWN! Always remember to pass BACKWARDS in rugby!",
+                "MUDTACULAR! Mud makes tackles twice as fun!",
+                "Did you know? A Try gives your team 5 big points!",
+                "Keep learning your rugby words to unlock the Legend Trophy!"
+            ];
+            const randomQuote = funnyQuotes[Math.floor(Math.random() * funnyQuotes.length)];
+            updateMascotSpeech(randomQuote);
+        }
+
+        /* INITIALIZATION */
+        window.onload = function() {
+            updateCardDisplay();
+        };
+    </script>
+</body>
+</html>
