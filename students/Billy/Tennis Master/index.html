@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tennis Master - Vocabulary & Rules Visualizer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tennis: {
+                            yellow: '#d4f53c',
+                            'yellow-hover': '#bada24',
+                            green: '#0b381e',
+                            'green-light': '#14532d',
+                            'court-blue': '#2255a4',
+                            'court-green': '#1e6840',
+                            'line-white': '#f8fafc'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Card Flip Animation */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* SVG Court Styling & Interactive Elements */
+        .court-zone {
+            transition: all 0.25s ease;
+            cursor: pointer;
+            fill-opacity: 0.25;
+            stroke-width: 2px;
+        }
+        .court-zone:hover {
+            fill-opacity: 0.6;
+            stroke-width: 3px;
+            filter: drop-shadow(0 0 6px rgba(212, 245, 60, 0.8));
+        }
+        .court-zone.active {
+            fill-opacity: 0.75;
+            stroke: #d4f53c !important;
+            stroke-width: 4px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b381e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e6840;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4f53c;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-full flex flex-col selection:bg-tennis-yellow selection:text-tennis-green">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 bg-tennis-green/90 backdrop-blur-md border-b border-emerald-800/50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Logo -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('court')">
+                    <div class="w-10 h-10 rounded-full bg-tennis-yellow flex items-center justify-center text-tennis-green font-bold text-xl shadow-md shadow-tennis-yellow/20">
+                        <i class="fa-solid font-bold">🎾</i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight text-white block leading-none">TENNIS<span class="text-tennis-yellow">MASTER</span></span>
+                        <span class="text-xs text-emerald-400 font-medium">Rules & Vocabulary Hub</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs (Desktop) -->
+                <nav class="hidden md:flex space-x-1 bg-black/20 p-1.5 rounded-xl border border-emerald-800/40">
+                    <button onclick="switchTab('court')" id="nav-court" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-tennis-yellow bg-emerald-900/60 shadow">
+                        <i class="fa-solid fa-map-location-dot"></i> Court Visualizer
+                    </button>
+                    <button onclick="switchTab('flashcards')" id="nav-flashcards" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-800/40">
+                        <i class="fa-solid fa-clone"></i> Flashcards & Terms
+                    </button>
+                    <button onclick="switchTab('rules')" id="nav-rules" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-800/40">
+                        <i class="fa-solid fa-book-open"></i> Rules & Simulator
+                    </button>
+                    <button onclick="switchTab('quiz')" id="nav-quiz" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-800/40">
+                        <i class="fa-solid fa-trophy"></i> Master Quiz
+                    </button>
+                </nav>
+
+                <!-- Mastery Tracker Summary Pill -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-black/40 border border-emerald-700/50 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-medium">
+                        <i class="fa-solid fa-circle-check text-tennis-yellow"></i>
+                        <span>Mastery: <strong id="header-mastery-count" class="text-tennis-yellow">0</strong>/<span id="header-total-count">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu Bar -->
+        <div class="md:hidden border-t border-emerald-800/40 bg-black/30 px-2 py-2 flex justify-around text-xs font-semibold">
+            <button onclick="switchTab('court')" id="mobile-nav-court" class="mobile-tab-btn flex flex-col items-center gap-1 p-1 text-tennis-yellow">
+                <i class="fa-solid fa-map-location-dot text-base"></i> Court
+            </button>
+            <button onclick="switchTab('flashcards')" id="mobile-nav-flashcards" class="mobile-tab-btn flex flex-col items-center gap-1 p-1 text-slate-400">
+                <i class="fa-solid fa-clone text-base"></i> Vocabulary
+            </button>
+            <button onclick="switchTab('rules')" id="mobile-nav-rules" class="mobile-tab-btn flex flex-col items-center gap-1 p-1 text-slate-400">
+                <i class="fa-solid fa-book-open text-base"></i> Rules
+            </button>
+            <button onclick="switchTab('quiz')" id="mobile-nav-quiz" class="mobile-tab-btn flex flex-col items-center gap-1 p-1 text-slate-400">
+                <i class="fa-solid fa-trophy text-base"></i> Quiz
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- ================================================================= -->
+        <!-- TAB 1: INTERACTIVE COURT VISUALIZER / TERMS MAP -->
+        <!-- ================================================================= -->
+        <section id="tab-court" class="tab-content block space-y-6 animate-fade-in">
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+                            <i class="fa-solid fa-map-marked-alt text-tennis-yellow"></i> Interactive Tennis Court Map
+                        </h1>
+                        <p class="text-slate-400 text-sm mt-1">Click on any section of the court to reveal its official terms, dimensions, tactics, and governing rules.</p>
+                    </div>
+                    <div class="text-xs bg-tennis-green/60 border border-emerald-600/40 text-emerald-300 px-3 py-2 rounded-xl flex items-center gap-2 self-start md:self-auto">
+                        <i class="fa-solid fa-mouse-pointer text-tennis-yellow animate-bounce"></i> Click court zones below
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <!-- SVG Court Canvas Area -->
+                    <div class="lg:col-span-7 bg-slate-950 p-4 sm:p-6 rounded-xl border border-slate-800 shadow-inner flex flex-col items-center justify-center">
+                        <div class="w-full max-w-lg aspect-[1/2] relative">
+                            <!-- SVG Representation of Standard Tennis Court -->
+                            <svg viewBox="0 0 360 720" class="w-full h-full drop-shadow-2xl select-none" id="court-svg">
+                                <!-- Outer Out-of-bounds Surround Surface -->
+                                <rect x="0" y="0" width="360" height="720" fill="#1e40af" rx="12" />
+                                
+                                <!-- Main Playing Court Surface -->
+                                <rect x="30" y="40" width="300" height="640" fill="#2255a4" stroke="#f8fafc" stroke-width="3" />
+
+                                <!-- INTERACTIVE ZONES OVERLAY (Clickable Paths) -->
+
+                                <!-- 1. Baseline Area (Near / Bottom) -->
+                                <rect id="zone-baseline" onclick="selectCourtZone('baseline')" class="court-zone" x="30" y="610" width="300" height="70" fill="#d4f53c" stroke="#d4f53c"/>
+                                
+                                <!-- 2. Doubles Alley (Left & Right) -->
+                                <rect id="zone-alley-left" onclick="selectCourtZone('alley')" class="court-zone" x="30" y="40" width="45" height="640" fill="#38bdf8" stroke="#38bdf8"/>
+                                <rect id="zone-alley-right" onclick="selectCourtZone('alley')" class="court-zone" x="285" y="40" width="45" height="640" fill="#38bdf8" stroke="#38bdf8"/>
+
+                                <!-- 3. No Man's Land / Transition Zone (Bottom Half) -->
+                                <rect id="zone-nomansland" onclick="selectCourtZone('nomansland')" class="court-zone" x="75" y="490" width="210" height="120" fill="#fbbf24" stroke="#fbbf24"/>
+
+                                <!-- 4. Deuce Court (Bottom Right Service Box) -->
+                                <rect id="zone-deuce" onclick="selectCourtZone('deuce')" class="court-zone" x="180" y="360" width="105" height="130" fill="#a855f7" stroke="#a855f7"/>
+
+                                <!-- 5. Ad Court (Bottom Left Service Box) -->
+                                <rect id="zone-ad" onclick="selectCourtZone('ad')" class="court-zone" x="75" y="360" width="105" height="130" fill="#ec4899" stroke="#ec4899"/>
+
+                                <!-- 6. Net Zone (Middle Area) -->
+                                <rect id="zone-net" onclick="selectCourtZone('net')" class="court-zone" x="20" y="340" width="320" height="40" fill="#f43f5e" stroke="#f43f5e"/>
+
+                                <!-- COURT LINES (WHITE STROKES - Visual Overlay) -->
+                                <!-- Singles Sidelines -->
+                                <line x1="75" y1="40" x2="75" y2="680" stroke="#f8fafc" stroke-width="3"/>
+                                <line x1="285" y1="40" x2="285" y2="680" stroke="#f8fafc" stroke-width="3"/>
+
+                                <!-- Service Lines (Top & Bottom) -->
+                                <line x1="75" y1="230" x2="285" y2="230" stroke="#f8fafc" stroke-width="3"/>
+                                <line x1="75" y1="490" x2="285" y2="490" stroke="#f8fafc" stroke-width="3"/>
+
+                                <!-- Center Service Line -->
+                                <line x1="180" y1="230" x2="180" y2="490" stroke="#f8fafc" stroke-width="3"/>
+
+                                <!-- Baseline Center Marks -->
+                                <line x1="180" y1="40" x2="180" y2="52" stroke="#f8fafc" stroke-width="3"/>
+                                <line x1="180" y1="680" x2="180" y2="668" stroke="#f8fafc" stroke-width="3"/>
+
+                                <!-- Net Line & Posts -->
+                                <line x1="20" y1="360" x2="340" y2="360" stroke="#ffffff" stroke-width="4" stroke-dasharray="6,4"/>
+                                <circle cx="20" cy="360" r="5" fill="#f8fafc" />
+                                <circle cx="340" cy="360" r="5" fill="#f8fafc" />
+
+                                <!-- SVG Text Labels -->
+                                <text x="180" y="655" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle" pointer-events="none">BASELINE</text>
+                                <text x="180" y="365" fill="#ffffff" font-size="13" font-weight="extrabold" text-anchor="middle" pointer-events="none">NET</text>
+                                <text x="127" y="430" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle" pointer-events="none">AD COURT</text>
+                                <text x="232" y="430" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle" pointer-events="none">DEUCE COURT</text>
+                                <text x="180" y="555" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle" pointer-events="none">NO MAN'S LAND</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Selected Zone Details Panel -->
+                    <div class="lg:col-span-5 flex flex-col h-full justify-between space-y-4">
+                        <div id="court-zone-details" class="bg-slate-900 border border-slate-800 p-6 rounded-xl space-y-4 shadow-lg">
+                            <!-- Dynamic Content Rendered Here -->
+                        </div>
+
+                        <!-- Mini Quick Reference Cards -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-emerald-950/40 border border-emerald-800/40 p-3 rounded-xl">
+                                <div class="text-tennis-yellow font-bold text-xs uppercase tracking-wider mb-1">Standard Court</div>
+                                <div class="text-slate-200 text-sm font-semibold">78 ft × 27 ft</div>
+                                <div class="text-slate-400 text-xs">Singles boundary dimensions</div>
+                            </div>
+                            <div class="bg-emerald-950/40 border border-emerald-800/40 p-3 rounded-xl">
+                                <div class="text-tennis-yellow font-bold text-xs uppercase tracking-wider mb-1">Doubles Court</div>
+                                <div class="text-slate-200 text-sm font-semibold">78 ft × 36 ft</div>
+                                <div class="text-slate-400 text-xs">Includes both side alleys</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- TAB 2: COMPREHENSIVE FLASHCARDS & GLOSSARY -->
+        <!-- ================================================================= -->
+        <section id="tab-flashcards" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur">
+                <!-- Header Controls & Search -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+                            <i class="fa-solid fa-clone text-tennis-yellow"></i> Tennis Vocabulary & Flashcards
+                        </h1>
+                        <p class="text-slate-400 text-sm mt-1">Study essential terminology. Flip cards to learn definitions, pro tips, and audio pronunciations.</p>
+                    </div>
+
+                    <!-- Progress Bar Component -->
+                    <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl w-full md:w-64">
+                        <div class="flex justify-between items-center text-xs mb-1">
+                            <span class="text-slate-400 font-medium">Vocabulary Mastery</span>
+                            <span id="mastery-percentage" class="text-tennis-yellow font-bold">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                            <div id="mastery-bar-fill" class="bg-tennis-yellow h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filter Toolbars -->
+                <div class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <!-- Search Input -->
+                    <div class="relative flex-grow">
+                        <i class="fa-solid fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                        <input type="text" id="vocab-search" oninput="filterTerms()" placeholder="Search tennis terms (e.g. Deuce, Topspin, Let)..." 
+                            class="w-full bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-500 text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-tennis-yellow focus:ring-1 focus:ring-tennis-yellow transition-all">
+                    </div>
+
+                    <!-- Category Filter Pills -->
+                    <div class="flex gap-2 overflow-x-auto pb-1 sm:pb-0 text-xs font-semibold scrollbar-none" id="category-filters">
+                        <button onclick="setCategoryFilter('all')" class="cat-filter-btn px-4 py-2.5 rounded-xl bg-tennis-yellow text-tennis-green whitespace-nowrap transition-all shadow">All Terms</button>
+                        <button onclick="setCategoryFilter('Scoring')" class="cat-filter-btn px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 whitespace-nowrap transition-all">Scoring</button>
+                        <button onclick="setCategoryFilter('Shots')" class="cat-filter-btn px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 whitespace-nowrap transition-all">Shots & Strokes</button>
+                        <button onclick="setCategoryFilter('Rules')" class="cat-filter-btn px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 whitespace-nowrap transition-all">Rules & Faults</button>
+                        <button onclick="setCategoryFilter('Equipment')" class="cat-filter-btn px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 whitespace-nowrap transition-all">Equipment & Court</button>
+                    </div>
+                </div>
+
+                <!-- Flashcard Display Grid -->
+                <div id="flashcards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards dynamically populated via JS -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="no-terms-found" class="hidden text-center py-16 text-slate-500">
+                    <i class="fa-solid fa-ghost text-4xl mb-3"></i>
+                    <p class="text-base font-medium">No matching tennis terms found.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- TAB 3: TENNIS RULES GUIDE & DYNAMIC SCORING SIMULATOR -->
+        <!-- ================================================================= -->
+        <section id="tab-rules" class="tab-content hidden space-y-8">
+            <!-- Dynamic Interactive Scoring Simulator Header Section -->
+            <div class="bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 border border-emerald-800/60 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 text-emerald-900/20 text-9xl pointer-events-none font-extrabold">
+                    15-40
+                </div>
+
+                <div class="max-w-3xl mb-6">
+                    <span class="inline-block bg-tennis-yellow/20 text-tennis-yellow text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider mb-2">Interactive Scoreboard Simulator</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Live Tennis Scoring Engine</h2>
+                    <p class="text-slate-300 text-sm mt-1">Experience how tennis scoring works in real-time. Award points to the Server or Receiver to see game transitions, Deuce, Advantage, and Set progressions!</p>
+                </div>
+
+                <!-- Tennis Scoreboard Display -->
+                <div class="bg-black/80 rounded-xl border-2 border-emerald-700/60 p-4 sm:p-6 shadow-2xl max-w-2xl mx-auto">
+                    <!-- Scoreboard Header -->
+                    <div class="grid grid-cols-12 text-slate-400 text-xs font-bold border-b border-slate-800 pb-2 mb-3 uppercase tracking-wider text-center">
+                        <div class="col-span-5 text-left pl-2">Player</div>
+                        <div class="col-span-2">Sets</div>
+                        <div class="col-span-2">Games</div>
+                        <div class="col-span-3 text-tennis-yellow">Points</div>
+                    </div>
+
+                    <!-- Server Row -->
+                    <div class="grid grid-cols-12 items-center py-2.5 border-b border-slate-800/60 text-sm sm:text-base">
+                        <div class="col-span-5 font-bold text-white flex items-center gap-2 pl-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-tennis-yellow shadow-sm shadow-tennis-yellow animate-pulse" title="Serving"></span>
+                            <span>Server</span>
+                        </div>
+                        <div id="sim-server-sets" class="col-span-2 font-mono font-bold text-center text-slate-300">0</div>
+                        <div id="sim-server-games" class="col-span-2 font-mono font-bold text-center text-slate-300">0</div>
+                        <div id="sim-server-points" class="col-span-3 font-mono font-extrabold text-center text-2xl text-tennis-yellow">0</div>
+                    </div>
+
+                    <!-- Receiver Row -->
+                    <div class="grid grid-cols-12 items-center py-2.5 text-sm sm:text-base">
+                        <div class="col-span-5 font-bold text-white flex items-center gap-2 pl-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+                            <span>Receiver</span>
+                        </div>
+                        <div id="sim-receiver-sets" class="col-span-2 font-mono font-bold text-center text-slate-300">0</div>
+                        <div id="sim-receiver-games" class="col-span-2 font-mono font-bold text-center text-slate-300">0</div>
+                        <div id="sim-receiver-points" class="col-span-3 font-mono font-extrabold text-center text-2xl text-tennis-yellow">0</div>
+                    </div>
+
+                    <!-- Live Game Status Callout -->
+                    <div id="sim-status-banner" class="mt-4 bg-emerald-950/80 border border-emerald-600/50 text-emerald-200 text-xs sm:text-sm font-semibold p-2.5 rounded-lg text-center flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-info-circle text-tennis-yellow"></i>
+                        <span id="sim-status-text">Game started. Server is serving from Deuce Court.</span>
+                    </div>
+
+                    <!-- Simulator Controls -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5">
+                        <button onclick="awardPoint('server')" class="bg-tennis-yellow hover:bg-tennis-yellow-hover text-tennis-green font-extrabold py-3 px-4 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i> Point Server
+                        </button>
+                        <button onclick="awardPoint('receiver')" class="bg-emerald-700 hover:bg-emerald-600 text-white font-extrabold py-3 px-4 rounded-xl shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i> Point Receiver
+                        </button>
+                        <button onclick="resetSimulator()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 px-4 rounded-xl border border-slate-700 transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-rotate-left"></i> Reset Match
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comprehensive Tennis Rules Modules -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Module 1: The Scoring System -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                        <div class="w-10 h-10 rounded-xl bg-tennis-green flex items-center justify-center text-tennis-yellow text-lg font-bold">1</div>
+                        <h3 class="text-xl font-bold text-white">The Scoring Hierarchy</h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>Point Progression:</strong> Points go from <strong>0 (Love)</strong> &rarr; <strong>15</strong> &rarr; <strong>30</strong> &rarr; <strong>40</strong> &rarr; <strong>Game</strong>.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>Deuce & Advantage:</strong> If score reaches 40-40, it is called <em>Deuce</em>. A player must win two consecutive points from Deuce to win the game (Advantage &rarr; Game).</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>Sets:</strong> A player wins a set by reaching <strong>6 games</strong> first, with a margin of at least 2 games (e.g., 6-4). If tied at 6-6, a 7-point Tiebreak is played.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>Matches:</strong> Matches are typically played as Best-of-3 sets (or Best-of-5 in Men's Grand Slam events).</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Module 2: Serving Mechanics -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                        <div class="w-10 h-10 rounded-xl bg-tennis-green flex items-center justify-center text-tennis-yellow text-lg font-bold">2</div>
+                        <h3 class="text-xl font-bold text-white">Serving Rules & Rotation</h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>Service Diagonal:</strong> The server always begins each game from behind the right (Deuce) court baseline, serving diagonally into the opponent's right service box.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>Two Attempts:</strong> Serves get two chances (1st serve & 2nd serve). Missing both results in a <em>Double Fault</em> and point loss.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>Foot Fault:</strong> The server's feet must NOT touch the baseline or inside the court before striking the ball.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>Let Serve:</strong> If a serve clips the net cord but lands inside the correct service box, a <em>Let</em> is called, and the server re-takes that serve.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Module 3: Boundary Rules (In vs Out) -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                        <div class="w-10 h-10 rounded-xl bg-tennis-green flex items-center justify-center text-tennis-yellow text-lg font-bold">3</div>
+                        <h3 class="text-xl font-bold text-white">In vs. Out Lines</h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>Lines are IN:</strong> If any part of the ball touches any portion of the white boundary line (even 1 millimeter!), the ball is legally <strong>IN</strong>.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>One Bounce Limit:</strong> The ball can only bounce once on your side of the court before you return it over the net.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>Net Touches:</strong> Players or their racquets cannot touch the net at any point during an active point, or they lose the point immediately.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Module 4: Changeovers & Tiebreaks -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+                        <div class="w-10 h-10 rounded-xl bg-tennis-green flex items-center justify-center text-tennis-yellow text-lg font-bold">4</div>
+                        <h3 class="text-xl font-bold text-white">Changeovers & Tiebreaks</h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>Side Changeovers:</strong> Players swap sides of the court on every <strong>odd game total</strong> in a set (e.g., at 1-0, 2-1, 3-2, 4-3, 5-0).</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>7-Point Tiebreak:</strong> At 6-6 in a set, a tiebreak is played. First to reach 7 points with a 2-point lead wins the set (e.g. 7-5, 8-6).</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-check-circle text-tennis-yellow mt-1"></i>
+                            <span><strong>Tiebreak Serve Rotation:</strong> Server A serves 1 point. Then Server B serves 2 points, Server A serves 2 points, alternating until finished.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- TAB 4: TENNIS RULES & VOCABULARY QUIZ GAME -->
+        <!-- ================================================================= -->
+        <section id="tab-quiz" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur max-w-3xl mx-auto">
+                <!-- Quiz Header Stats -->
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-tennis-yellow flex items-center justify-center text-tennis-green text-lg font-extrabold shadow">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-extrabold text-white">Tennis Mastery Challenge</h2>
+                            <p class="text-xs text-slate-400">Test your rules and vocabulary prowess</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 text-xs font-bold">
+                        <div class="bg-black/40 border border-slate-800 px-3 py-1.5 rounded-lg">
+                            <span class="text-slate-400">Streak: </span>
+                            <span id="quiz-streak" class="text-tennis-yellow">🔥 0</span>
+                        </div>
+                        <div class="bg-black/40 border border-slate-800 px-3 py-1.5 rounded-lg">
+                            <span class="text-slate-400">Score: </span>
+                            <span id="quiz-score" class="text-emerald-400">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Question Container -->
+                <div id="quiz-body" class="space-y-6">
+                    <!-- Question Counter & Category Badge -->
+                    <div class="flex justify-between items-center text-xs">
+                        <span id="quiz-cat-badge" class="bg-emerald-950 text-emerald-300 border border-emerald-800 px-2.5 py-1 rounded-md font-medium uppercase">Category</span>
+                        <span id="quiz-progress-text" class="text-slate-400 font-medium">Question 1 of 10</span>
+                    </div>
+
+                    <!-- Question Prompt -->
+                    <h3 id="quiz-question-text" class="text-lg sm:text-xl font-bold text-slate-100 leading-snug">
+                        Loading question...
+                    </h3>
+
+                    <!-- Choice Options List -->
+                    <div id="quiz-options-container" class="space-y-3">
+                        <!-- Dynamic Options Buttons -->
+                    </div>
+
+                    <!-- Feedback & Next Question Bar -->
+                    <div id="quiz-feedback-box" class="hidden p-4 rounded-xl border space-y-3">
+                        <div id="quiz-feedback-title" class="font-bold text-base flex items-center gap-2"></div>
+                        <p id="quiz-feedback-explanation" class="text-xs sm:text-sm text-slate-300"></p>
+                        <button onclick="nextQuizQuestion()" class="w-full bg-tennis-yellow hover:bg-tennis-yellow-hover text-tennis-green font-extrabold py-2.5 px-4 rounded-xl transition-all shadow">
+                            Continue to Next Question <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Completion Summary Screen (Hidden by default) -->
+                <div id="quiz-results-screen" class="hidden text-center py-8 space-y-6">
+                    <div class="w-20 h-20 bg-tennis-yellow/20 text-tennis-yellow border-2 border-tennis-yellow rounded-full flex items-center justify-center text-4xl mx-auto shadow-xl animate-bounce">
+                        🏆
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-extrabold text-white">Quiz Completed!</h3>
+                        <p class="text-slate-400 text-sm mt-1">Here is your final performance breakdown:</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                        <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl">
+                            <div class="text-xs text-slate-400 uppercase font-semibold">Final Score</div>
+                            <div id="quiz-final-score" class="text-2xl font-extrabold text-tennis-yellow">0/10</div>
+                        </div>
+                        <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl">
+                            <div class="text-xs text-slate-400 uppercase font-semibold">Accuracy</div>
+                            <div id="quiz-final-accuracy" class="text-2xl font-extrabold text-emerald-400">0%</div>
+                        </div>
+                    </div>
+
+                    <button onclick="restartQuiz()" class="bg-tennis-yellow hover:bg-tennis-yellow-hover text-tennis-green font-extrabold px-6 py-3 rounded-xl shadow-lg transition-transform active:scale-95 inline-flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Try Quiz Again
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800/80 py-6 mt-12 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <span class="text-tennis-yellow font-bold">🎾 TennisMaster</span> &mdash; Interactive Rules & Terminology Guide
+            </div>
+            <div>
+                Crafted for tennis players, coaches, & enthusiasts.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        /* ====================================================================
+           1. DATA STRUCTURES & DATASETS
+           ==================================================================== */
+
+        // Court Zone Interactive Data Map
+        const courtZonesData = {
+            baseline: {
+                title: "The Baseline",
+                color: "text-tennis-yellow",
+                dimensions: "36 feet (10.97 m) wide line at the back",
+                vocabulary: ["Baseline Exchange", "Groundstroke", "Deep Ball", "Foot Fault"],
+                tactics: "The primary zone for rally building. Modern tennis players spend 70-80% of points playing behind or near the baseline executing groundstrokes (forehands and backhands).",
+                rules: "When serving, the server must stand completely behind the baseline between the center mark and sidelines. Stepping on or over the line before contacting the ball causes a Foot Fault."
+            },
+            alley: {
+                title: "Doubles Alley (Tramlines)",
+                color: "text-sky-400",
+                dimensions: "4.5 feet (1.37 m) wide strip on both sides",
+                vocabulary: ["Doubles Alley", "Tramlines", "Wide Ball", "Poaching"],
+                tactics: "Active strictly during Doubles play. In Singles play, any ball bouncing inside the alley is considered OUT.",
+                rules: "In Singles: Out of bounds. In Doubles: In bounds for all shots after the serve."
+            },
+            nomansland: {
+                title: "No Man's Land (Transition Zone)",
+                color: "text-amber-400",
+                dimensions: "Area between the Service Line and Baseline",
+                vocabulary: ["Transition Zone", "Half Volley", "Approach Shot", "Short Ball"],
+                tactics: "Tactically dangerous to linger here! You are too far back to volley effectively and too close to comfortably bounce groundstrokes. Pass through quickly when moving to the net.",
+                rules: "Standard court area. Often produces difficult 'half-volleys' where the ball bounces right at your feet."
+            },
+            deuce: {
+                title: "Deuce Court (Right Service Box)",
+                color: "text-purple-400",
+                dimensions: "21 feet (6.40 m) long × 13.5 feet (4.11 m) wide",
+                vocabulary: ["Deuce Court", "Body Serve", "T-Serve", "Wide Serve"],
+                tactics: "The starting court for every game. Serves are hit diagonally from the server's right side into this box when scores are even (0-0, 15-15, 30-30, Deuce).",
+                rules: "The serve MUST land inside this box without touching the surrounding court lines or net (unless it's a let)."
+            },
+            ad: {
+                title: "Ad (Advantage) Court",
+                color: "text-pink-400",
+                dimensions: "21 feet (6.40 m) long × 13.5 feet (4.11 m) wide",
+                vocabulary: ["Ad Court", "Advantage In/Out", "Break Point", "Kick Serve"],
+                tactics: "Used when point counts are odd (15-0, 30-15, 40-30, Advantage). Crucial high-pressure points (like Break Points) are played starting into this court.",
+                rules: "Serves must land within this box when points are odd."
+            },
+            net: {
+                title: "Net & Volley Zone",
+                color: "text-rose-400",
+                dimensions: "Net Height: 3 feet (0.914 m) at center, 3.5 feet at posts",
+                vocabulary: ["Volley", "Overhead Smash", "Drop Volley", "Let", "Net Cord"],
+                tactics: "Attacking position! Attracting the opponent to hit passing shots or lobs while you cut off angles with crisp volleys.",
+                rules: "If a player touches the net with their body or racquet while the ball is live, they lose the point immediately."
+            }
+        };
+
+        // Master Vocabulary Dataset
+        const vocabularyData = [
+            {
+                id: "ace",
+                term: "Ace",
+                category: "Scoring",
+                phonetic: "/eɪs/",
+                definition: "A serve that lands in the correct service box and is untouched by the receiver, automatically winning the point.",
+                example: "Federer hit an unreturnable ace down the T to save break point.",
+                proTip: "Toss the ball consistently at 1 o'clock to hit maximum power aces.",
+                mastered: false
+            },
+            {
+                id: "deuce",
+                term: "Deuce",
+                category: "Scoring",
+                phonetic: "/djuːs/",
+                definition: "A score of 40-40 in a game. A player must score two consecutive points from deuce to win the game.",
+                example: "The game went to deuce five times before Djokovic broke serve.",
+                proTip: "Treat deuce points like set points—focus on high percentage first serves.",
+                mastered: false
+            },
+            {
+                id: "advantage",
+                term: "Advantage (Ad)",
+                category: "Scoring",
+                phonetic: "/ədˈvɑːntɪdʒ/",
+                definition: "The point scored directly after Deuce. 'Ad-In' means server's point; 'Ad-Out' means receiver's point.",
+                example: "She held Ad-In and closed out the set with a forehand winner.",
+                proTip: "Stay composed during Ad-Out points; pressure is equal on both players.",
+                mastered: false
+            },
+            {
+                id: "break-point",
+                term: "Break Point",
+                category: "Scoring",
+                phonetic: "/breɪk pɔɪnt/",
+                definition: "A situation where the receiver needs just one more point to win the game against the opponent's serve.",
+                example: "Alcaraz earned three break points in the final game.",
+                proTip: "On break point as receiver, stand firm and force the server to play a rally.",
+                mastered: false
+            },
+            {
+                id: "tiebreak",
+                term: "Tiebreak",
+                category: "Scoring",
+                phonetic: "/ˈtaɪbreɪk/",
+                definition: "A system played when a set reaches 6-6 to decide the winner. First to reach 7 points by 2 points wins.",
+                example: "The match went to a thrilling third-set tiebreak.",
+                proTip: "Minimizing unforced errors is more crucial in tiebreaks than hitting big winners.",
+                mastered: false
+            },
+            {
+                id: "topspin",
+                term: "Topspin",
+                category: "Shots",
+                phonetic: "/ˈtɒpspɪn/",
+                definition: "Forward rotation imparted on the ball that causes it to dip quickly into court and bounce high.",
+                example: "Nadal's heavy topspin forehand pushed his opponent deep behind the baseline.",
+                proTip: "Brush from low to high over the back of the ball to generate maximum spin.",
+                mastered: false
+            },
+            {
+                id: "slice",
+                term: "Slice (Backspin)",
+                category: "Shots",
+                phonetic: "/slaɪs/",
+                definition: "Backward rotation imparted on the ball causing it to float low over the net and stay low after bouncing.",
+                example: "She used a delicate backhand slice to neutralize her opponent's power.",
+                proTip: "Carve high-to-low through the ball while keeping your body quiet.",
+                mastered: false
+            },
+            {
+                id: "drop-shot",
+                term: "Drop Shot",
+                category: "Shots",
+                phonetic: "/drɒp ʃɒt/",
+                definition: "A delicate touch shot hit softly over the net, intended to land near the net with minimum forward bounce.",
+                example: "He disguised his drop shot brilliantly after a deep baseline exchange.",
+                proTip: "Hit drop shots when your opponent is pinned far behind the baseline.",
+                mastered: false
+            },
+            {
+                id: "volley",
+                term: "Volley",
+                category: "Shots",
+                phonetic: "/ˈvɒli/",
+                definition: "A shot hit before the ball bounces on the ground, typically executed when approaching or standing at the net.",
+                example: "She moved forward and hit a crisp drive volley to close the point.",
+                proTip: "Keep swing motion minimal—punch at the ball rather than taking a full backswing.",
+                mastered: false
+            },
+            {
+                id: "tweener",
+                term: "Tweener",
+                category: "Shots",
+                phonetic: "/ˈtwiːnər/",
+                definition: "A spectacular trick shot hit between the legs while running back toward the baseline with back turned to net.",
+                example: "The crowd erupted after Nick hit a winning tweener lob.",
+                proTip: "Requires precise timing and flexibility—practice with soft foam balls first!",
+                mastered: false
+            },
+            {
+                id: "foot-fault",
+                term: "Foot Fault",
+                category: "Rules",
+                phonetic: "/fʊt fɔːlt/",
+                definition: "An illegal serve committed when a server's foot touches the baseline or inside the court before contacting the ball.",
+                example: "The line judge called a foot fault on his second serve at 30-40.",
+                proTip: "Start your serve stance 2-3 inches behind the line to avoid accidental calls.",
+                mastered: false
+            },
+            {
+                id: "let",
+                term: "Let",
+                category: "Rules",
+                phonetic: "/let/",
+                definition: "A call made when a serve touches the net tape but lands inside the correct service box. The serve is replayed without penalty.",
+                example: "The umpire called 'Let, First Serve' after the ball clipped the net cord.",
+                proTip: "Lets can also be called if outside interference (like a ball rolling on court) occurs.",
+                mastered: false
+            },
+            {
+                id: "hawkeye",
+                term: "Hawk-Eye / Challenge",
+                category: "Rules",
+                phonetic: "/hɔːk aɪ/",
+                definition: "Computerized visual tracking system used to verify ball landing trajectories and line calls.",
+                example: "The player challenged the baseline out call, and Hawk-Eye showed it caught the line.",
+                proTip: "In modern pro tennis, Live Electronic Line Calling has replaced manual line judges.",
+                mastered: false
+            },
+            {
+                id: "dampener",
+                term: "Vibration Dampener",
+                category: "Equipment",
+                phonetic: "/ˈdaɪmpənər/",
+                definition: "A small rubber piece inserted into racquet strings below the bottom cross string to absorb high-frequency ping vibrations.",
+                example: "He installed a custom rubber dampener to improve frame feel.",
+                proTip: "Dampeners change string sound and feel, but do not prevent tennis elbow injuries.",
+                mastered: false
+            },
+            {
+                id: "grip-eastern",
+                term: "Continental Grip",
+                category: "Equipment",
+                phonetic: "/ˌkɒntɪˈnentl ɡrɪp/",
+                definition: "The versatile 'hammer' grip used for serves, volleys, slices, and overhead smashes.",
+                example: "Switching to a Continental grip immediately improved her serve slice angle.",
+                proTip: "Hold the racquet like you are shaking hands with the edge of the frame.",
+                mastered: false
+            }
+        ];
+
+        // Master Quiz Dataset
+        const quizQuestions = [
+            {
+                category: "Rules",
+                question: "During a rally, a groundstroke lands directly on the outside edge of the baseline. Is the ball IN or OUT?",
+                options: ["IN (Lines are part of the court)", "OUT", "A Let must be replayed", "Server's choice"],
+                answerIndex: 0,
+                explanation: "In tennis, lines are IN! If any part of the ball touches any part of the line (even 1 millimeter), it is considered in bounds."
+            },
+            {
+                category: "Scoring",
+                question: "If both players win 3 points in a game, what is the official tennis score called?",
+                options: ["30-30", "Deuce (40-40)", "Advantage In", "Equalizer"],
+                answerIndex: 1,
+                explanation: "Three points won by each player equals 40-40, which is officially termed 'Deuce'."
+            },
+            {
+                category: "Vocabulary",
+                question: "What is an unreturnable serve that lands in the service box without the receiver touching it called?",
+                options: ["Smash", "Winner", "Ace", "Passing Shot"],
+                answerIndex: 2,
+                explanation: "An Ace is a legal serve that touches the ground in the service box and is untouched by the receiver."
+            },
+            {
+                category: "Rules",
+                question: "What happens if a server steps on the baseline while swinging and hitting a serve?",
+                options: ["Point penalty", "Foot Fault (Counts as a missed serve)", "Warning", "Nothing"],
+                answerIndex: 1,
+                explanation: "Stepping on or over the baseline before contacting the ball is a Foot Fault, resulting in a fault for that serve."
+            },
+            {
+                category: "Court & Equipment",
+                question: "When playing Singles tennis, which area of the court is considered OUT OF BOUNDS?",
+                options: ["Service boxes", "Baseline area", "Doubles Alleys (Tramlines)", "Ad Court"],
+                answerIndex: 2,
+                explanation: "The Doubles Alleys (tramlines on either side) are out of bounds during Singles play."
+            },
+            {
+                category: "Shots",
+                question: "Which shot is struck before the ball bounces on the court?",
+                options: ["Half Volley", "Groundstroke", "Drop Shot", "Volley"],
+                answerIndex: 3,
+                explanation: "A Volley is executed by hitting the ball in the air before it bounces on the ground."
+            },
+            {
+                category: "Rules",
+                question: "How often do players switch ends/sides of the court during a regular set?",
+                options: ["Every game", "Every odd game total (1, 3, 5, 7...)", "Every even game total", "Only after each set"],
+                answerIndex: 1,
+                explanation: "Players swap ends of the court after every odd game total in a set (e.g. 1-0, 2-1, 3-2)."
+            }
+        ];
+
+
+        /* ====================================================================
+           2. STATE MANAGEMENT
+           ==================================================================== */
+        let currentCategoryFilter = 'all';
+        let searchQuery = '';
+        let masteredTermIds = JSON.parse(localStorage.getItem('tennis_mastered_terms') || '[]');
+
+        // Simulator State
+        let simState = {
+            serverPoints: 0,
+            receiverPoints: 0,
+            serverGames: 0,
+            receiverGames: 0,
+            serverSets: 0,
+            receiverSets: 0,
+            statusText: "Game started. Server serving from Deuce Court."
+        };
+
+        // Quiz State
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+        let quizStreak = 0;
+        let quizAnswered = false;
+
+
+        /* ====================================================================
+           3. AUDIO ENGINE (Web Audio API Synthesizer)
+           ==================================================================== */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.15); // E5
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'incorrect') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(130, now + 0.25);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'pop') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            }
+        }
+
+        // Text To Speech Pronunciation
+        function speakWord(word) {
+            playSound('pop');
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop active speech
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+
+        /* ====================================================================
+           4. NAVIGATION & TAB SWITCHING
+           ==================================================================== */
+        function switchTab(tabId) {
+            playSound('pop');
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            // Update Desktop Nav styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-tennis-yellow', 'bg-emerald-900/60', 'shadow');
+                btn.classList.add('text-slate-300');
+            });
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('text-tennis-yellow', 'bg-emerald-900/60', 'shadow');
+                activeNav.classList.remove('text-slate-300');
+            }
+
+            // Update Mobile Nav styles
+            document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+                btn.classList.remove('text-tennis-yellow');
+                btn.classList.add('text-slate-400');
+            });
+            const activeMobileNav = document.getElementById(`mobile-nav-${tabId}`);
+            if (activeMobileNav) {
+                activeMobileNav.classList.add('text-tennis-yellow');
+                activeMobileNav.classList.remove('text-slate-400');
+            }
+        }
+
+
+        /* ====================================================================
+           5. INTERACTIVE COURT VISUALIZER
+           ==================================================================== */
+        function selectCourtZone(zoneId) {
+            playSound('pop');
+            // Remove active classes
+            document.querySelectorAll('.court-zone').forEach(el => el.classList.remove('active'));
+            
+            // Add active highlight
+            const targetZone = document.getElementById(`zone-${zoneId}`);
+            if (targetZone) targetZone.classList.add('active');
+
+            const data = courtZonesData[zoneId];
+            if (!data) return;
+
+            const container = document.getElementById('court-zone-details');
+            container.innerHTML = `
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h3 class="text-xl font-extrabold ${data.color}">${data.title}</h3>
+                    <span class="text-xs bg-slate-800 text-slate-300 font-mono px-2.5 py-1 rounded-md">${data.dimensions}</span>
+                </div>
+
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1.5">Key Vocabulary Terms</div>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${data.vocabulary.map(v => `<span class="bg-emerald-950 border border-emerald-800/80 text-tennis-yellow text-xs px-2.5 py-1 rounded-lg font-medium">${v}</span>`).join('')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Tactical Importance</div>
+                        <p class="text-slate-300 leading-relaxed text-xs sm:text-sm">${data.tactics}</p>
+                    </div>
+
+                    <div>
+                        <div class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Governing Rules</div>
+                        <p class="text-slate-300 leading-relaxed text-xs sm:text-sm bg-slate-950 p-3 rounded-lg border border-slate-800/80">${data.rules}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        /* ====================================================================
+           6. COMPREHENSIVE VOCABULARY & FLASHCARDS
+           ==================================================================== */
+        function renderFlashcards() {
+            const grid = document.getElementById('flashcards-grid');
+            grid.innerHTML = '';
+
+            const filtered = vocabularyData.filter(item => {
+                const matchesCat = currentCategoryFilter === 'all' || item.category === item.categoryFilter || item.category.toLowerCase().includes(currentCategoryFilter.toLowerCase());
+                const matchesSearch = item.term.toLowerCase().includes(searchQuery) || item.definition.toLowerCase().includes(searchQuery);
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                document.getElementById('no-terms-found').classList.remove('hidden');
+            } else {
+                document.getElementById('no-terms-found').classList.add('hidden');
+            }
+
+            filtered.forEach(item => {
+                const isMastered = masteredTermIds.includes(item.id);
+                
+                const cardHTML = `
+                    <div class="group h-80 perspective-1000">
+                        <div id="card-inner-${item.id}" class="relative w-full h-full duration-500 transform-style-3d transition-transform">
+                            
+                            <!-- CARD FRONT -->
+                            <div class="absolute inset-0 w-full h-full bg-slate-900 border ${isMastered ? 'border-tennis-yellow/60' : 'border-slate-800'} rounded-2xl p-6 flex flex-col justify-between backface-hidden shadow-xl">
+                                <div>
+                                    <div class="flex items-center justify-between mb-4">
+                                        <span class="text-xs font-bold uppercase px-2.5 py-1 rounded-md bg-emerald-950 text-emerald-300 border border-emerald-800/60">${item.category}</span>
+                                        <button onclick="toggleMastered('${item.id}', event)" class="text-sm font-semibold transition-transform active:scale-90" title="Mark as Mastered">
+                                            <i class="fa-${isMastered ? 'solid' : 'regular'} fa-circle-check text-xl ${isMastered ? 'text-tennis-yellow' : 'text-slate-600 hover:text-slate-400'}"></i>
+                                        </button>
+                                    </div>
+
+                                    <h3 class="text-2xl font-extrabold text-white tracking-tight mb-1">${item.term}</h3>
+                                    <div class="text-xs text-slate-400 font-mono mb-4 flex items-center gap-2">
+                                        <span>${item.phonetic}</span>
+                                        <button onclick="speakWord('${item.term}'); event.stopPropagation();" class="text-tennis-yellow hover:text-tennis-yellow-hover p-1" title="Listen Pronunciation">
+                                            <i class="fa-solid fa-volume-high"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <button onclick="flipCard('${item.id}')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold py-2.5 rounded-xl border border-slate-700 transition-colors flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-rotate"></i> Flip for Definition & Pro Tip
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- CARD BACK -->
+                            <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-slate-900 to-slate-950 border border-tennis-yellow/40 rounded-2xl p-6 flex flex-col justify-between backface-hidden rotate-y-180 shadow-2xl">
+                                <div>
+                                    <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                                        <span class="text-xs font-bold text-tennis-yellow">${item.term}</span>
+                                        <span class="text-xs text-slate-400">Definition & Tip</span>
+                                    </div>
+
+                                    <p class="text-xs sm:text-sm text-slate-200 font-medium leading-relaxed mb-3">${item.definition}</p>
+                                    
+                                    <div class="bg-black/40 border border-emerald-800/30 p-2.5 rounded-xl">
+                                        <div class="text-[10px] text-tennis-yellow font-bold uppercase tracking-wider mb-1">Pro Tip</div>
+                                        <p class="text-xs text-slate-300 italic">"${item.proTip}"</p>
+                                    </div>
+                                </div>
+
+                                <button onclick="flipCard('${item.id}')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-2 rounded-xl border border-slate-700 transition-colors flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-arrow-left"></i> Flip Back
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', cardHTML);
+            });
+
+            updateMasteryTracker();
+        }
+
+        function flipCard(cardId) {
+            playSound('pop');
+            const cardInner = document.getElementById(`card-inner-${cardId}`);
+            if (cardInner) {
+                cardInner.classList.toggle('rotate-y-180');
+            }
+        }
+
+        function toggleMastered(termId, event) {
+            if (event) event.stopPropagation();
+            playSound('pop');
+
+            if (masteredTermIds.includes(termId)) {
+                masteredTermIds = masteredTermIds.filter(id => id !== termId);
+            } else {
+                masteredTermIds.push(termId);
+            }
+
+            localStorage.setItem('tennis_mastered_terms', JSON.stringify(masteredTermIds));
+            renderFlashcards();
+        }
+
+        function setCategoryFilter(cat) {
+            playSound('pop');
+            currentCategoryFilter = cat;
+
+            document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-tennis-yellow', 'text-tennis-green');
+                btn.classList.add('bg-slate-950', 'text-slate-300', 'border-slate-800');
+            });
+
+            event.target.classList.add('bg-tennis-yellow', 'text-tennis-green');
+            event.target.classList.remove('bg-slate-950', 'text-slate-300', 'border-slate-800');
+
+            renderFlashcards();
+        }
+
+        function filterTerms() {
+            searchQuery = document.getElementById('vocab-search').value.toLowerCase();
+            renderFlashcards();
+        }
+
+        function updateMasteryTracker() {
+            const total = vocabularyData.length;
+            const mastered = masteredTermIds.length;
+            const percentage = Math.round((mastered / total) * 100);
+
+            document.getElementById('header-mastery-count').textContent = mastered;
+            document.getElementById('header-total-count').textContent = total;
+            document.getElementById('mastery-percentage').textContent = `${percentage}%`;
+            document.getElementById('mastery-bar-fill').style.width = `${percentage}%`;
+        }
+
+
+        /* ====================================================================
+           7. DYNAMIC TENNIS SCORING SIMULATOR ENGINE
+           ==================================================================== */
+        const pointNames = ["0", "15", "30", "40"];
+
+        function awardPoint(winner) {
+            playSound('pop');
+
+            let sPts = simState.serverPoints;
+            let rPts = simState.receiverPoints;
+
+            if (winner === 'server') {
+                sPts++;
+            } else {
+                rPts++;
+            }
+
+            // Logic for checking Game Win
+            if (sPts >= 4 && sPts >= rPts + 2) {
+                // Server wins game
+                simState.serverGames++;
+                simState.statusText = "🎉 Game Server! Games reset, players swap serving order.";
+                resetPointsOnly();
+            } else if (rPts >= 4 && rPts >= sPts + 2) {
+                // Receiver wins game (Break of serve)
+                simState.receiverGames++;
+                simState.statusText = "💥 BREAK OF SERVE! Receiver wins the game!";
+                resetPointsOnly();
+            } else {
+                simState.serverPoints = sPts;
+                simState.receiverPoints = rPts;
+                updateStatusText();
+            }
+
+            // Check Set Win (First to 6 by 2)
+            if (simState.serverGames >= 6 && simState.serverGames >= simState.receiverGames + 2) {
+                simState.serverSets++;
+                simState.statusText = "🏆 SET SERVER! Server wins the set!";
+                simState.serverGames = 0;
+                simState.receiverGames = 0;
+            } else if (simState.receiverGames >= 6 && simState.receiverGames >= simState.serverGames + 2) {
+                simState.receiverSets++;
+                simState.statusText = "🏆 SET RECEIVER! Receiver wins the set!";
+                simState.serverGames = 0;
+                simState.receiverGames = 0;
+            }
+
+            renderSimulator();
+        }
+
+        function resetPointsOnly() {
+            simState.serverPoints = 0;
+            simState.receiverPoints = 0;
+        }
+
+        function resetSimulator() {
+            playSound('pop');
+            simState = {
+                serverPoints: 0,
+                receiverPoints: 0,
+                serverGames: 0,
+                receiverGames: 0,
+                serverSets: 0,
+                receiverSets: 0,
+                statusText: "Game started. Server serving from Deuce Court."
+            };
+            renderSimulator();
+        }
+
+        function updateStatusText() {
+            const sp = simState.serverPoints;
+            const rp = simState.receiverPoints;
+
+            if (sp >= 3 && rp >= 3) {
+                if (sp === rp) {
+                    simState.statusText = "🔥 DEUCE! Next point gains Advantage.";
+                } else if (sp === rp + 1) {
+                    simState.statusText = "⚡ ADVANTAGE SERVER (Ad-In)! Game point for server.";
+                } else if (rp === sp + 1) {
+                    simState.statusText = "⚡ ADVANTAGE RECEIVER (Ad-Out)! Break point for receiver.";
+                }
+            } else {
+                const totalPoints = sp + rp;
+                const courtSide = (totalPoints % 2 === 0) ? "Deuce Court (Right)" : "Ad Court (Left)";
+                simState.statusText = `Server serving from ${courtSide}.`;
+            }
+        }
+
+        function renderSimulator() {
+            // Display formatted points
+            let serverDisplay = "";
+            let receiverDisplay = "";
+
+            const sp = simState.serverPoints;
+            const rp = simState.receiverPoints;
+
+            if (sp >= 3 && rp >= 3) {
+                if (sp === rp) {
+                    serverDisplay = "40";
+                    receiverDisplay = "40";
+                } else if (sp === rp + 1) {
+                    serverDisplay = "AD";
+                    receiverDisplay = "40";
+                } else if (rp === sp + 1) {
+                    serverDisplay = "40";
+                    receiverDisplay = "AD";
+                }
+            } else {
+                serverDisplay = pointNames[sp] || "40";
+                receiverDisplay = pointNames[rp] || "40";
+            }
+
+            document.getElementById('sim-server-points').textContent = serverDisplay;
+            document.getElementById('sim-receiver-points').textContent = receiverDisplay;
+
+            document.getElementById('sim-server-games').textContent = simState.serverGames;
+            document.getElementById('sim-receiver-games').textContent = simState.receiverGames;
+
+            document.getElementById('sim-server-sets').textContent = simState.serverSets;
+            document.getElementById('sim-receiver-sets').textContent = simState.receiverSets;
+
+            document.getElementById('sim-status-text').textContent = simState.statusText;
+        }
+
+
+        /* ====================================================================
+           8. TENNIS RULES & VOCABULARY QUIZ GAME
+           ==================================================================== */
+        function loadQuizQuestion() {
+            quizAnswered = false;
+            document.getElementById('quiz-feedback-box').classList.add('hidden');
+
+            const q = quizQuestions[currentQuizIndex];
+            document.getElementById('quiz-cat-badge').textContent = q.category;
+            document.getElementById('quiz-progress-text').textContent = `Question ${currentQuizIndex + 1} of ${quizQuestions.length}`;
+            document.getElementById('quiz-question-text').textContent = q.question;
+
+            const optsContainer = document.getElementById('quiz-options-container');
+            optsContainer.innerHTML = '';
+
+            q.options.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "quiz-opt-btn w-full text-left bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 text-sm font-medium p-4 rounded-xl transition-all flex items-center justify-between group";
+                btn.onclick = () => checkQuizAnswer(idx);
+                btn.innerHTML = `
+                    <span>${optText}</span>
+                    <i class="fa-regular fa-circle text-slate-600 group-hover:text-tennis-yellow"></i>
+                `;
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selectedIndex) {
+            if (quizAnswered) return;
+            quizAnswered = true;
+
+            const q = quizQuestions[currentQuizIndex];
+            const isCorrect = selectedIndex === q.answerIndex;
+
+            const buttons = document.querySelectorAll('.quiz-opt-btn');
+            
+            if (isCorrect) {
+                playSound('correct');
+                quizScore += 10;
+                quizStreak++;
+                buttons[selectedIndex].classList.add('bg-emerald-950', 'border-emerald-500', 'text-emerald-200');
+                buttons[selectedIndex].querySelector('i').className = 'fa-solid fa-circle-check text-emerald-400';
+            } else {
+                playSound('incorrect');
+                quizStreak = 0;
+                buttons[selectedIndex].classList.add('bg-rose-950', 'border-rose-500', 'text-rose-200');
+                buttons[selectedIndex].querySelector('i').className = 'fa-solid fa-circle-xmark text-rose-400';
+
+                // Highlight correct
+                buttons[q.answerIndex].classList.add('bg-emerald-950/60', 'border-emerald-600/60', 'text-emerald-300');
+            }
+
+            // Update Header Stats
+            document.getElementById('quiz-score').textContent = quizScore;
+            document.getElementById('quiz-streak').textContent = `🔥 ${quizStreak}`;
+
+            // Show Feedback
+            const feedbackBox = document.getElementById('quiz-feedback-box');
+            const feedbackTitle = document.getElementById('quiz-feedback-title');
+            const feedbackExp = document.getElementById('quiz-feedback-explanation');
+
+            feedbackBox.classList.remove('hidden');
+            if (isCorrect) {
+                feedbackBox.className = "p-4 rounded-xl border bg-emerald-950/80 border-emerald-700/60 text-emerald-200 space-y-3";
+                feedbackTitle.innerHTML = `<i class="fa-solid fa-circle-check text-tennis-yellow"></i> Correct! (+10 pts)`;
+            } else {
+                feedbackBox.className = "p-4 rounded-xl border bg-rose-950/80 border-rose-700/60 text-rose-200 space-y-3";
+                feedbackTitle.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400"></i> Incorrect`;
+            }
+
+            feedbackExp.textContent = q.explanation;
+        }
+
+        function nextQuizQuestion() {
+            playSound('pop');
+            currentQuizIndex++;
+            if (currentQuizIndex < quizQuestions.length) {
+                loadQuizQuestion();
+            } else {
+                showQuizResults();
+            }
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-body').classList.add('hidden');
+            document.getElementById('quiz-results-screen').classList.remove('hidden');
+
+            const totalMax = quizQuestions.length * 10;
+            const accuracy = Math.round((quizScore / totalMax) * 100);
+
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalMax}`;
+            document.getElementById('quiz-final-accuracy').textContent = `${accuracy}%`;
+        }
+
+        function restartQuiz() {
+            playSound('pop');
+            currentQuizIndex = 0;
+            quizScore = 0;
+            quizStreak = 0;
+
+            document.getElementById('quiz-score').textContent = '0';
+            document.getElementById('quiz-streak').textContent = '🔥 0';
+
+            document.getElementById('quiz-results-screen').classList.add('hidden');
+            document.getElementById('quiz-body').classList.remove('hidden');
+
+            loadQuizQuestion();
+        }
+
+
+        /* ====================================================================
+           9. INITIALIZATION ON PAGE LOAD
+           ==================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            // 1. Select Default Baseline Zone in Court Map
+            selectCourtZone('baseline');
+
+            // 2. Render Flashcards
+            renderFlashcards();
+
+            // 3. Render Simulator
+            renderSimulator();
+
+            // 4. Initialize Quiz
+            loadQuizQuestion();
+        });
+    </script>
+</body>
+</html>
