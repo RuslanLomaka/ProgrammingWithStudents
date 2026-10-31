@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c25">
+  <meta name="description" content="A true-or-false animal facts game with ESL vocabulary.">
+  <title>Wild Truths — Animal Fact Challenge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="animal-quiz.css">
+  <script src="animal-quiz.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="back-link" href="../../../index.html" aria-label="Back to Programming with Students">
+        <span aria-hidden="true">←</span> Gallery
+      </a>
+      <div class="brand"><span class="brand-mark">W</span><span>WILD TRUTHS<small>ANIMAL FACT CHALLENGE</small></span></div>
+      <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true" title="Turn sounds off">
+        <span aria-hidden="true">♪</span><span class="sound-label">Sound on</span>
+      </button>
+    </header>
+
+    <section class="game-layout" aria-live="polite">
+      <aside class="explorer-panel">
+        <p class="kicker">IVAN'S ANIMAL LAB</p>
+        <h1>How wild is<br><em>the truth?</em></h1>
+        <p class="intro">Guess the facts, discover record breakers, and collect useful English words.</p>
+
+        <div class="round-picker" role="group" aria-label="Choose round length">
+          <button class="round-option active" type="button" data-round="10">Quick 10</button>
+          <button class="round-option" type="button" data-round="30">All 30</button>
+        </div>
+
+        <div class="scoreboard">
+          <div><span id="scoreValue">0</span><small>SCORE</small></div>
+          <div><span id="streakValue">0</span><small>STREAK</small></div>
+          <div><span id="wordsValue">0</span><small>WORDS</small></div>
+        </div>
+
+        <div class="level-key" aria-label="Question levels">
+          <span><i class="level-dot easy"></i> Easy</span>
+          <span><i class="level-dot curious"></i> Curious</span>
+          <span><i class="level-dot expert"></i> Expert</span>
+        </div>
+      </aside>
+
+      <section class="quiz-stage">
+        <div class="progress-row">
+          <span id="questionCounter">QUESTION 1 / 10</span>
+          <div class="progress-track" aria-hidden="true"><span id="progressBar"></span></div>
+          <span id="levelLabel" class="level-badge easy">EASY</span>
+        </div>
+
+        <article class="question-card" id="questionCard">
+          <div class="animal-orbit" aria-hidden="true">
+            <span class="orbit-ring"></span>
+            <span class="animal-emoji" id="animalEmoji">🦎</span>
+          </div>
+          <p class="animal-name" id="animalName">Loading the expedition…</p>
+          <h2 id="questionText">Please wait while the animal facts arrive.</h2>
+
+          <div class="answer-grid" id="answerButtons">
+            <button class="answer-btn true-btn" type="button" data-answer="true">
+              <span class="answer-icon" aria-hidden="true">✓</span>
+              <span><strong>TRUE</strong><small>Yes, that is correct</small></span>
+            </button>
+            <button class="answer-btn false-btn" type="button" data-answer="false">
+              <span class="answer-icon" aria-hidden="true">×</span>
+              <span><strong>FALSE</strong><small>No, that is a myth</small></span>
+            </button>
+          </div>
+
+          <div class="feedback" id="feedback" hidden>
+            <div class="feedback-heading">
+              <span class="verdict-icon" id="verdictIcon" aria-hidden="true">✓</span>
+              <div><p id="verdictText">Excellent!</p><span id="correctAnswerText">The statement is true.</span></div>
+            </div>
+            <p class="fact-explanation" id="factExplanation"></p>
+            <div class="vocab-card">
+              <span>WORD TO KEEP</span>
+              <strong id="vocabWord"></strong>
+              <p id="vocabDefinition"></p>
+            </div>
+            <div class="feedback-actions">
+              <a id="sourceLink" href="#" target="_blank" rel="noopener">Check the source ↗</a>
+              <button id="nextButton" type="button">Next animal <span aria-hidden="true">→</span></button>
+            </div>
+          </div>
+        </article>
+
+        <section class="results-card" id="resultsCard" hidden>
+          <span class="result-animal" aria-hidden="true">🦉</span>
+          <p class="kicker">EXPEDITION COMPLETE</p>
+          <h2 id="resultTitle">Wildlife expert!</h2>
+          <p id="resultSummary"></p>
+          <div class="result-score"><strong id="finalScore">0/10</strong><span>correct answers</span></div>
+          <div class="result-actions">
+            <button id="playAgainButton" type="button">Play a new round</button>
+            <a href="../../../index.html">Back to gallery</a>
+          </div>
+        </section>
+
+        <p class="loading-error" id="loadingError" hidden>We could not load the questions. Please open this game from the published website or a local web server.</p>
+      </section>
+    </section>
+  </main>
+</body>
+</html>
